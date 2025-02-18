@@ -16,6 +16,7 @@ import categoryRoutes from "./routes/categoryRoutes"
 import queryRoutes from "./routes/queryRoutes"
 import swaggerUi from "swagger-ui-express"
 import swaggerJSDoc from "swagger-jsdoc"
+import errorHandler from "./middleware/errorHandler";
 // Load environment variables
 dotenv.config();
 
@@ -63,6 +64,7 @@ app.use(cors({
 }));
 app.use(express.json());
 
+
 db.dbConnect();
 
 app.use("/", userRoutes);
@@ -76,6 +78,8 @@ db.expense=Expense;
 db.emi=Emi;
 db.loan=Loan;
 db.category=Category;
+
+app.use(errorHandler);
 
 // Sync Models with Database
 db.sequelize

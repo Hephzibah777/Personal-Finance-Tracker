@@ -1,11 +1,10 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import db from "../config/db";
 import { QueryTypes } from "sequelize";
 
-async function addcategory(req: Request, res: Response): Promise<void> {
+async function addCategory(req: Request, res: Response, next:NextFunction): Promise<void> {
   try {
     const {name}= req.body;
-    console.log(name);
     if (!name) {
       res.status(400).json({ error: "category is missing" });
     }
@@ -16,11 +15,11 @@ async function addcategory(req: Request, res: Response): Promise<void> {
       });
       res.status(200).json({message:"Successfully added"})
   } catch (error) {
-    res.status(500).json(error);
+    next(error);
   }
 }
 
-async function getAllcategory(req: Request, res: Response): Promise<void> {
+async function getAllCategory(req: Request, res: Response, next:NextFunction): Promise<void> {
   try {
    
     const categories = await db.sequelize.query(`SELECT * From Categories`, {
@@ -28,13 +27,13 @@ async function getAllcategory(req: Request, res: Response): Promise<void> {
     });
     res.send(categories);
   } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
+    next(error);
   }
 }
 
 const categoryController = {
-  addcategory: addcategory,
-  getAllcategory: getAllcategory,
+  addCategory: addCategory,
+  getAllCategory: getAllCategory,
 };
 
 export default categoryController;

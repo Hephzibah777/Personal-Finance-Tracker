@@ -79,12 +79,12 @@ import queryController from "../controllers/query";
 
 const router = express.Router();
 
-router.get("/totalincome", authenticateToken, queryController.totalincome);
-router.get("/totalexpense", authenticateToken, queryController.totalexpense);
+router.get("/totalincome", authenticateToken, queryController.totalIncome);
+router.get("/totalexpense", authenticateToken, queryController.totalExpense);
 router.get("/month/:year", authenticateToken, queryController.getByMonth);
 router.get("/categorydata", authenticateToken, queryController.getByCategory);
-router.get("/incomesdesc", authenticateToken, queryController.getdescincomes);
-router.get("/expensesdesc", authenticateToken, queryController.getdescexpenses);
-router.get("/categoryper", authenticateToken, queryController.getcategorypercentage);
+router.get("/incomesdesc", authenticateToken, queryController.getDescIncomes);
+router.get("/expensesdesc", authenticateToken, queryController.getDescExpenses);
+router.get("/categoryper", authenticateToken, queryController.getCategoryPercentage);
 
 export default router;

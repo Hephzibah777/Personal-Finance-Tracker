@@ -126,10 +126,10 @@ const router = express.Router();
  *           description: Expense updated successfully
  */
 
-router.post("/expenses", authenticateToken, expenseController.addexpense);
-router.get("/expenses", authenticateToken, expenseController.getAllexpense);
-router.get("/expenses/:id", authenticateToken, expenseController.getselectedexpense);
-router.delete("/expenses/:id", authenticateToken, expenseController.deleteselectedexpense);
-router.patch("/expenses/:id", authenticateToken, expenseController.updateselectedexpense);
+router.post("/expenses", authenticateToken, expenseController.addExpense);
+router.get("/expenses", authenticateToken, expenseController.getAllExpense);
+router.get("/expenses/:id", authenticateToken, expenseController.getSelectedExpense);
+router.delete("/expenses/:id", authenticateToken, expenseController.deleteSelectedExpense);
+router.patch("/expenses/:id", authenticateToken, expenseController.updateSelectedExpense);
 
 export default router;

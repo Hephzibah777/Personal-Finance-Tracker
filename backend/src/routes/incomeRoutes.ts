@@ -126,10 +126,10 @@ const router = express.Router();
  *           description: Income record updated successfully
  */
 
-router.post("/incomes", authenticateToken, incomeController.addincome);
-router.get("/incomes", authenticateToken, incomeController.getAllincome);
-router.get("/incomes/:id", authenticateToken, incomeController.getselectedincome);
-router.delete("/incomes/:id", authenticateToken, incomeController.deleteselectedincome);
-router.patch("/incomes/:id", authenticateToken, incomeController.updateselectedincome);
+router.post("/incomes", authenticateToken, incomeController.addIncome);
+router.get("/incomes", authenticateToken, incomeController.getAllIncome);
+router.get("/incomes/:id", authenticateToken, incomeController.getSelectedIncome);
+router.delete("/incomes/:id", authenticateToken, incomeController.deleteSelectedIncome);
+router.patch("/incomes/:id", authenticateToken, incomeController.updateSelectedIncome);
 
 export default router;
