@@ -3,11 +3,14 @@ import { useState } from 'react'
 import './App.css'
 import Signup from './authentication/Signup'
 import Login from "./authentication/Login";
-import Home from "./dashboard/Home"
+import Home from "./components/Home";
+import { UserProvider } from "./hooks/UserProvider";
+
 function App() {
 
   return (
     <>
+    <UserProvider>
       <Router>
         <div>
           <Routes>
@@ -17,6 +20,7 @@ function App() {
           </Routes>
         </div>
       </Router>
+      </UserProvider>
     </>
   )
 }

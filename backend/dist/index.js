@@ -7,20 +7,21 @@ const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const cors_1 = __importDefault(require("cors"));
 const db_1 = __importDefault(require("./config/db")); // Import the database connection
-const user_1 = __importDefault(require("./models/user"));
-const income_1 = __importDefault(require("./models/income"));
-const expense_1 = __importDefault(require("./models/expense"));
-const emi_1 = __importDefault(require("./models/emi"));
-const userRoutes_1 = __importDefault(require("./routes/userRoutes"));
-const loan_1 = __importDefault(require("./models/loan"));
+const user_1 = __importDefault(require("./model/user"));
+const income_1 = __importDefault(require("./model/income"));
+const expense_1 = __importDefault(require("./model/expense"));
+const emi_1 = __importDefault(require("./model/emi"));
+const userRoutes_1 = __importDefault(require("./route/userRoutes"));
+const loan_1 = __importDefault(require("./model/loan"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
-const category_1 = __importDefault(require("./models/category"));
-const incomeRoutes_1 = __importDefault(require("./routes/incomeRoutes"));
-const expenseRoutes_1 = __importDefault(require("./routes/expenseRoutes"));
-const categoryRoutes_1 = __importDefault(require("./routes/categoryRoutes"));
-const queryRoutes_1 = __importDefault(require("./routes/queryRoutes"));
+const category_1 = __importDefault(require("./model/category"));
+const incomeRoutes_1 = __importDefault(require("./route/incomeRoutes"));
+const expenseRoutes_1 = __importDefault(require("./route/expenseRoutes"));
+const categoryRoutes_1 = __importDefault(require("./route/categoryRoutes"));
+const queryRoutes_1 = __importDefault(require("./route/queryRoutes"));
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const swagger_jsdoc_1 = __importDefault(require("swagger-jsdoc"));
+const errorHandler_1 = __importDefault(require("./middleware/errorHandler"));
 // Load environment variables
 dotenv_1.default.config();
 const app = (0, express_1.default)();
@@ -73,6 +74,7 @@ db_1.default.expense = expense_1.default;
 db_1.default.emi = emi_1.default;
 db_1.default.loan = loan_1.default;
 db_1.default.category = category_1.default;
+app.use(errorHandler_1.default);
 // Sync Models with Database
 db_1.default.sequelize
     .sync()

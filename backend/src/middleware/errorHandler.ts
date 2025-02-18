@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-
+import errorType from '../type/errorType';
+import CustomError from './CustomError';
 // Custom error handler middleware
 async function errorHandler(
-  err: any, // The error object passed from previous middleware
+  err: CustomError, // The error object passed from previous middleware
   req: Request, 
   res: Response, 
   next: NextFunction
@@ -11,16 +12,15 @@ async function errorHandler(
   // Log the error for debugging purposes
 
   // Default status and message
-  let statusCode = err.status || 500;  // Fallback to 500 if no status is set
   let message = err.message || 'Internal Server Error';
+  let statusCode = err.status || 500
 
   // Handle specific error cases
-  if (err.name === 'SyntaxError') {
-    statusCode = 400;  // Bad Request for SyntaxError
+  if (err.status === 400) {
     message = 'Invalid JSON syntax';
   }
 
-  if (err.name === 'ValidationError') {
+  if (err.status=400) {
     statusCode = 400;
     message = `Validation error: ${err.message}`;
   }

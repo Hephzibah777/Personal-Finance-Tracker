@@ -8,6 +8,8 @@ import { error } from "console";
 import jwt from "jsonwebtoken";
 import userType from "../type/userType";
 import userRepo from "../repositary/user";
+import { verify } from "crypto";
+import verifyToken from "../helper/verifyToken";
 
 const SECRET_KEY = process.env.SECRET_KEY as string;
 
@@ -44,10 +46,10 @@ async function addUser(req: Request, res: Response, next: NextFunction): Promise
   
   async function getSelectedUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const id = req.params.userId;
-      const user= await userRepo.getSelectedUser(id, next);
-      console.log(user.length);
-      res.json(user);
+      const {userId} = verifyToken(req);
+      const user= await userRepo.getSelectedUser(userId, next);
+
+      res.json(user[0]);
     } catch (error) {
       next(error); // Pass to global error handler
     }

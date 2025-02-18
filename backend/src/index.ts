@@ -2,25 +2,25 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import db from "./config/db"; // Import the database connection
-import User from "./models/user";
-import Income from "./models/income";
-import Expense from "./models/expense";
-import Emi from "./models/emi";
-import userRoutes from "./routes/userRoutes";
-import Loan from "./models/loan";
+import User from "./model/user";
+import Income from "./model/income";
+import Expense from "./model/expense";
+import Emi from "./model/emi";
+import userRoutes from "./route/userRoutes";
+import Loan from "./model/loan";
 import cookieParser from "cookie-parser";
-import Category from "./models/category";
-import incomeRoutes from "./routes/incomeRoutes"
-import expenseRoutes from "./routes/expenseRoutes"
-import categoryRoutes from "./routes/categoryRoutes"
-import queryRoutes from "./routes/queryRoutes"
+import Category from "./model/category";
+import incomeRoutes from "./route/incomeRoutes"
+import expenseRoutes from "./route/expenseRoutes"
+import categoryRoutes from "./route/categoryRoutes"
+import queryRoutes from "./route/queryRoutes"
 import swaggerUi from "swagger-ui-express"
 import swaggerJSDoc from "swagger-jsdoc"
 import errorHandler from "./middleware/errorHandler";
 
 
 
-// Load environment variables
+// Load environment variables hello
 dotenv.config();
 
 
@@ -65,7 +65,7 @@ app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Middleware
 app.use(cors({
-  origin:"http://localhost:5174",
+  origin:"http://localhost:5173",
   credentials:true
 }));
 app.use(express.json());

@@ -14,7 +14,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // router.patch("/users/{userId", authenticateToken, userController.updateselecteduser);
 // export default router;
 const express_1 = __importDefault(require("express"));
-const user_1 = __importDefault(require("../controllers/user"));
+const user_1 = __importDefault(require("../controller/user"));
 const auth_1 = __importDefault(require("../middleware/auth"));
 const router = express_1.default.Router();
 // User-related routes
@@ -146,10 +146,10 @@ const router = express_1.default.Router();
  *         200:
  *           description: User logged out successfully
  */
-router.post("/signup", user_1.default.adduser);
+router.post("/signup", user_1.default.addUser);
 router.post("/login", user_1.default.login);
-router.get("/users", auth_1.default, user_1.default.getAllusers);
-router.get("/users/:userId", auth_1.default, user_1.default.getselecteduser);
-router.patch("/users/:userId", auth_1.default, user_1.default.updateselecteduser);
+router.get("/users", auth_1.default, user_1.default.getAllUsers);
+router.get("/users/:userId", auth_1.default, user_1.default.getSelectedUser);
+router.patch("/users/:userId", auth_1.default, user_1.default.updateSelectedUser);
 router.post("/logout", user_1.default.logout);
 exports.default = router;

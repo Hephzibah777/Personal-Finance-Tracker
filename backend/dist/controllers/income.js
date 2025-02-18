@@ -3,110 +3,113 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const db_1 = __importDefault(require("../config/db"));
 const sequelize_1 = require("sequelize");
-async function addincome(req, res) {
+const verifyToken_1 = __importDefault(require("../helpers/verifyToken"));
+const dotenv_1 = __importDefault(require("dotenv"));
+// Load environment variables
+dotenv_1.default.config();
+const l = process.env.JWT;
+// Add Income
+async function addIncome(req, res, next) {
     try {
         const { amount, description } = req.body;
-        const createdAt = new Date();
-        const updatedAt = new Date();
         if (!amount || !description) {
-            res.status(400).json({ error: "amount and description is missing" });
+            res.status(400).json({ error: "Amount and description are required" });
+            return;
         }
-        const rtoken = req.header("Authorization");
-        const token = rtoken.replace("Bearer ", "");
-        const decoded = jsonwebtoken_1.default.verify(token, "your_secret_key");
-        const userId = decoded.userId;
-        const income = await db_1.default.sequelize.query(`INSERT INTO Incomes(userId, amount, description, createdAt, updatedAt) VALUES(:userId, :amount, :description, :createdAt, :updatedAt)`, {
-            replacements: { userId: userId, amount: amount, description: description, createdAt: createdAt, updatedAt: updatedAt },
-            type: sequelize_1.QueryTypes.INSERT
+        const { userId } = (0, verifyToken_1.default)(req);
+        const timestamp = new Date();
+        await db_1.default.sequelize.query(`INSERT INTO Incomes (userId, amount, description, createdAt, updatedAt) 
+       VALUES (:userId, :amount, :description, :createdAt, :updatedAt)`, {
+            replacements: { userId, amount, description, createdAt: timestamp, updatedAt: timestamp },
+            type: sequelize_1.QueryTypes.INSERT,
         });
-        res.status(200).json({ error: "Successfully added the income details" });
+        res.status(201).json({ message: "Income added successfully" });
     }
     catch (error) {
-        res.status(500).json({ error: "Internal Server Error" });
+        next(error);
     }
 }
-async function getAllincome(req, res) {
+// Get All Income
+async function getAllIncome(req, res, next) {
     try {
-        const rtoken = req.header("Authorization");
-        const token = rtoken.replace("Bearer ", "");
-        const decoded = jsonwebtoken_1.default.verify(token, "your_secret_key");
-        const userId = decoded.userId;
-        const income = await db_1.default.sequelize.query(`SELECT * From Incomes where userId=:userId ORDER BY createdAt DESC LIMIT 5`, {
-            replacements: { userId: userId },
-            type: sequelize_1.QueryTypes.SELECT
+        console.log(l);
+        const { userId } = (0, verifyToken_1.default)(req);
+        const income = await db_1.default.sequelize.query(`SELECT * FROM Incomes WHERE userId = :userId ORDER BY createdAt DESC LIMIT 5`, {
+            replacements: { userId },
+            type: sequelize_1.QueryTypes.SELECT,
         });
-        res.send(income);
+        res.status(200).json(income);
     }
     catch (error) {
-        res.status(500).json({ error: "Internal Server Error" });
+        next(error);
     }
 }
-async function getselectedincome(req, res) {
+// Get Selected Income
+async function getSelectedIncome(req, res, next) {
     try {
-        const id = req.params.id;
-        const rtoken = req.header("Authorization");
-        const token = rtoken.replace("Bearer ", "");
-        const decoded = jsonwebtoken_1.default.verify(token, "your_secret_key");
-        const userId = decoded.userId;
-        const income = await db_1.default.sequelize.query(`SELECT * From Incomes where userId=:userId AND id=:id `, {
-            replacements: { userId: userId, id: id },
-            type: sequelize_1.QueryTypes.SELECT
+        const { id } = req.params;
+        const { userId } = (0, verifyToken_1.default)(req);
+        const income = await db_1.default.sequelize.query(`SELECT * FROM Incomes WHERE userId = :userId AND id = :id`, {
+            replacements: { userId, id },
+            type: sequelize_1.QueryTypes.SELECT,
         });
-        res.send(income[0]);
+        if (!income.length) {
+            res.status(404).json({ error: "Income not found" });
+            return;
+        }
+        res.status(200).json(income[0]);
     }
     catch (error) {
-        res.status(500).json({ error: "Internal Server Error" });
+        next(error);
     }
 }
-async function deleteselectedincome(req, res) {
+// Delete Selected Income
+async function deleteSelectedIncome(req, res, next) {
     try {
-        const id = req.params.id;
-        const rtoken = req.header("Authorization");
-        const token = rtoken.replace("Bearer ", "");
-        const decoded = jsonwebtoken_1.default.verify(token, "your_secret_key");
-        const userId = decoded.userId;
-        const income = await db_1.default.sequelize.query(`DELETE FROM Incomes WHERE id=:id AND userId=:userId `, {
-            replacements: { id: id, userId: userId },
-            type: sequelize_1.QueryTypes.DELETE
+        const { id } = req.params;
+        const { userId } = (0, verifyToken_1.default)(req);
+        const result = await db_1.default.sequelize.query(`DELETE FROM Incomes WHERE id = :id AND userId = :userId`, {
+            replacements: { id, userId },
+            type: sequelize_1.QueryTypes.DELETE,
         });
-        res.status(200).json({ message: "Successfully deleted the income details" });
+        res.status(200).json({ message: "Income deleted successfully" });
     }
     catch (error) {
-        res.status(500).json({ error: "Internal Server Error" });
+        next(error);
     }
 }
-async function updateselectedincome(req, res) {
+// Update Selected Income
+async function updateSelectedIncome(req, res, next) {
     try {
-        const id = req.params.id;
+        const { id } = req.params;
+        const { userId } = (0, verifyToken_1.default)(req);
         const body = req.body;
         const updatedAt = new Date();
-        let col = "";
-        const rtoken = req.header("Authorization");
-        const token = rtoken.replace("Bearer ", "");
-        const decoded = jsonwebtoken_1.default.verify(token, "your_secret_key");
-        const userId = decoded.userId;
-        Object.keys(body).forEach(key => {
-            col = col + `${key}` + "=" + ":" + `${key}` + ",";
+        if (Object.keys(body).length === 0) {
+            res.status(400).json({ error: "No fields provided for update" });
+            return;
+        }
+        const updateFields = Object.keys(body)
+            .map((key) => `${key} = :${key}`)
+            .join(", ");
+        const query = `UPDATE Incomes SET ${updateFields}, updatedAt = :updatedAt WHERE id = :id AND userId = :userId`;
+        await db_1.default.sequelize.query(query, {
+            replacements: { ...body, updatedAt, id, userId },
+            type: sequelize_1.QueryTypes.UPDATE,
         });
-        const query = `UPDATE Incomes SET` + ` ` + col + `updatedAt=:updatedAt where id=:id AND userId=:userId`;
-        const income = await db_1.default.sequelize.query(query, {
-            replacements: { ...body, updatedAt: updatedAt, id: id, userId: userId },
-            type: sequelize_1.QueryTypes.UPDATE
-        });
-        res.status(200).json({ message: "Successfully updated the income details" });
+        res.status(201).json({ message: "Income updated successfully" });
     }
     catch (error) {
-        res.status(500).json({ error: "Internal Server Error" });
+        next(error);
     }
 }
 const incomeController = {
-    getselectedincome: getselectedincome,
-    addincome: addincome,
-    getAllincome: getAllincome,
-    deleteselectedincome: deleteselectedincome,
-    updateselectedincome: updateselectedincome,
+    addIncome,
+    getAllIncome,
+    getSelectedIncome,
+    deleteSelectedIncome,
+    updateSelectedIncome,
 };
 exports.default = incomeController;

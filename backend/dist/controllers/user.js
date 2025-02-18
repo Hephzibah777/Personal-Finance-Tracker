@@ -8,128 +8,129 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const db_1 = __importDefault(require("../config/db"));
 const sequelize_1 = require("sequelize");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const secretKey = "your_secret_key";
-async function adduser(req, res) {
+const SECRET_KEY = "your_secret_key";
+async function adduser(req, res, next) {
     try {
         const { username, firstname, lastname, email, password } = req.body;
-        const hashedpassword = await bcrypt_1.default.hash(password, 10);
-        const createdAt = new Date();
-        const updatedAt = new Date();
+        // Validate required fields
         if (!username) {
-            res.status(400).json({ error: "Username is required" });
-            return;
+            return next(new Error('Username is required'));
         }
         if (!email) {
-            res.status(400).json({ error: "Email is required" });
-            return;
+            return next(new Error('Email is required'));
         }
         if (!password) {
-            res.status(400).json({ error: "Password is required" });
-            return;
+            return next(new Error('Password is required'));
         }
+        // Validate email format
         const isValid = email_validator_1.default.validate(email);
         if (!isValid) {
-            res.status(400).json({ error: "Email is not valid" });
-            return;
+            return next(new Error('Email is not valid'));
         }
-        const checkuser = await db_1.default.sequelize.query(`SELECT * from Users where email=:email`, {
-            replacements: { email: email },
-            type: sequelize_1.QueryTypes.SELECT
+        // Hash the password
+        const hashedPassword = await bcrypt_1.default.hash(password, 10);
+        const createdAt = new Date();
+        const updatedAt = new Date();
+        // Check if user already exists
+        const checkUser = await db_1.default.sequelize.query(`SELECT * FROM Users WHERE email=:email`, {
+            replacements: { email },
+            type: sequelize_1.QueryTypes.SELECT,
         });
-        if (checkuser.length != 0) {
-            res.status(409).json({ error: "User already exists" });
-            return;
+        if (checkUser.length !== 0) {
+            return next(new Error('User already exists'));
         }
-        const user = db_1.default.sequelize.query(`INSERT INTO Users(username, firstname, lastname, email, password, createdAt, updatedAt) VALUES(:username, :firstname, :lastname, :email, :password, :createdAt, :updatedAt)`, {
-            replacements: { username: username, firstname: firstname, lastname: lastname, email: email, password: hashedpassword, createdAt: createdAt, updatedAt: updatedAt },
-            type: sequelize_1.QueryTypes.INSERT
+        // Insert the new user into the database
+        await db_1.default.sequelize.query(`INSERT INTO Users (username, firstname, lastname, email, password, createdAt, updatedAt) 
+        VALUES (:username, :firstname, :lastname, :email, :password, :createdAt, :updatedAt)`, {
+            replacements: { username, firstname, lastname, email, password: hashedPassword, createdAt, updatedAt },
+            type: sequelize_1.QueryTypes.INSERT,
         });
-        res.status(200).json({ message: "Users Successfully Added" });
+        // Return success response
+        res.status(200).json({ message: 'User successfully added' });
     }
     catch (error) {
-        res.status(500).json({ message: "Internal Server Error" });
+        // Pass any error to the global error handler middleware
+        next(error);
     }
 }
-async function login(req, res) {
+async function login(req, res, next) {
     try {
         const { email, password } = req.body;
         if (!email || !password) {
-            res.status(400).json({ error: "Email and password cannot be empty" });
-            return;
+            return next(new Error('Email and password cannot be empty'));
         }
-        const user = await db_1.default.sequelize.query(`SELECT * from Users where email=:email`, {
-            replacements: { email: email },
-            type: sequelize_1.QueryTypes.SELECT
+        const user = await db_1.default.sequelize.query(`SELECT * FROM Users WHERE email=:email`, {
+            replacements: { email },
+            type: sequelize_1.QueryTypes.SELECT,
         });
-        if (user.length == 0) {
-            res.status(400).json({ error: "User does not exist" });
-            return;
+        if (user.length === 0) {
+            return next(new Error('User does not exist'));
         }
         const isPasswordValid = await bcrypt_1.default.compare(password, user[0].password);
         if (!isPasswordValid) {
-            res.status(400).send("Invalid credentials.");
-            return;
+            return next(new Error('Invalid credentials'));
         }
-        const token = jsonwebtoken_1.default.sign({ userId: user[0].id, username: user[0].username, email: user[0].email }, secretKey, {
-            expiresIn: "1h",
-        });
-        res.send({ token: token });
+        const token = jsonwebtoken_1.default.sign({ userId: user[0].id, username: user[0].username, email: user[0].email }, SECRET_KEY, { expiresIn: '1h' });
+        res.json({ token });
     }
     catch (error) {
-        res.status(500).json({ message: "Internal Server Error" });
+        next(error); // Pass to global error handler
     }
 }
-async function getAllusers(req, res) {
+async function getAllusers(req, res, next) {
     try {
-        const users = db_1.default.sequelize.query('SELECT * FROM Users');
-        res.send(users);
+        const users = await db_1.default.sequelize.query('SELECT * FROM Users');
+        res.json(users);
     }
     catch (error) {
-        res.status(500).json({ message: "Internal Server Error" });
+        next(error); // Pass to global error handler
     }
 }
-async function getselecteduser(req, res) {
+async function getselecteduser(req, res, next) {
     try {
         const id = req.params.userId;
-        const user = db_1.default.sequelize.query('SELECT * FROM Users where id=:id', {
-            replacements: { id: id },
-            type: sequelize_1.QueryTypes.SELECT
+        const user = await db_1.default.sequelize.query('SELECT * FROM Users WHERE id=:id', {
+            replacements: { id },
+            type: sequelize_1.QueryTypes.SELECT,
         });
-        res.send(user);
+        res.json(user);
     }
     catch (error) {
-        res.status(500).json({ message: "Internal Server Error" });
+        next(error); // Pass to global error handler
     }
 }
-async function updateselecteduser(req, res) {
+async function updateselecteduser(req, res, next) {
     try {
         const id = req.params.userId;
         const body = req.body;
         const updatedAt = new Date();
-        let col = "";
-        Object.keys(body).forEach(key => {
-            col = col + `${key}` + "=" + ":" + `${key}` + ",";
+        let col = '';
+        Object.keys(body).forEach((key) => {
+            col += `${key}=:${key},`;
         });
-        const query = "UPDATE `Users` SET " + col + "updatedAt=:updatedAt";
-        const result = await db_1.default.sequelize.query(query, {
-            replacements: { updatedAt: updatedAt },
-            type: sequelize_1.QueryTypes.UPDATE
+        const query = `UPDATE Users SET ${col} updatedAt=:updatedAt`;
+        await db_1.default.sequelize.query(query, {
+            replacements: { updatedAt, ...body },
+            type: sequelize_1.QueryTypes.UPDATE,
         });
-        res.status(200).json({ message: "Successfully Updated the user details" });
+        res.status(200).json({ message: 'Successfully updated the user details' });
     }
     catch (error) {
-        res.status(500).json({ message: "Internal Server Error" });
+        next(error); // Pass to global error handler
     }
 }
-async function logout(req, res) {
-    console.log("hello");
-    res.clearCookie("authToken", {
-        path: "/",
-        secure: true,
-        sameSite: "strict"
-    });
-    console.log("hello");
-    res.status(200).json({ message: "Logged out successfully" });
+async function logout(req, res, next) {
+    try {
+        res.clearCookie('authToken', {
+            path: '/',
+            secure: true,
+            sameSite: 'strict',
+        });
+        res.status(200).json({ message: 'Logged out successfully' });
+    }
+    catch (error) {
+        next(error); // Pass to global error handler
+    }
 }
 const userController = {
     adduser: adduser,
@@ -137,6 +138,6 @@ const userController = {
     getAllusers: getAllusers,
     getselecteduser: getselecteduser,
     updateselecteduser: updateselecteduser,
-    logout: logout
+    logout: logout,
 };
 exports.default = userController;

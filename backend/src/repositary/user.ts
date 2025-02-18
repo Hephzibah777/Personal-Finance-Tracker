@@ -110,7 +110,7 @@ async function addUser(user:userDataType, next:NextFunction): Promise<void> {
     }
   }
 
-  async function getSelectedUser(id:string, next: NextFunction): Promise<userModalType[]> {
+  async function getSelectedUser(id:number, next: NextFunction): Promise<userModalType[]> {
     try {
       const user = await db.sequelize.query('SELECT * FROM Users WHERE id=:id', {
         replacements: { id },

@@ -6,31 +6,19 @@ import db from "../config/db";
 import { QueryTypes } from "sequelize";
 import verifyToken from "../helper/verifyToken";
 import dotenv from "dotenv";
+import incomeRepo from "../repositary/income";
+import expenseRepo from "../repositary/expense";
 
 // Load environment variables
 dotenv.config();
-const l= process.env.JWT
+
 // Add Income
 async function addIncome(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { amount, description } = req.body;
-    if (!amount || !description) {
-      res.status(400).json({ error: "Amount and description are required" });
-      return;
-    }
-
     const { userId } = verifyToken(req);
-    const timestamp = new Date();
-
-    await db.sequelize.query(
-      `INSERT INTO Incomes (userId, amount, description, createdAt, updatedAt) 
-       VALUES (:userId, :amount, :description, :createdAt, :updatedAt)`,
-      {
-        replacements: { userId, amount, description, createdAt: timestamp, updatedAt: timestamp },
-        type: QueryTypes.INSERT,
-      }
-    );
-
+    incomeRepo.addIncome(amount, description, userId, next);
+   
     res.status(201).json({ message: "Income added successfully" });
   } catch (error) {
     next(error);
@@ -40,15 +28,8 @@ async function addIncome(req: Request, res: Response, next: NextFunction): Promi
 // Get All Income
 async function getAllIncome(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    console.log(l);
     const { userId } = verifyToken(req);
-    const income = await db.sequelize.query(
-      `SELECT * FROM Incomes WHERE userId = :userId ORDER BY createdAt DESC LIMIT 5`,
-      {
-        replacements: { userId },
-        type: QueryTypes.SELECT,
-      }
-    );
+   const income=await incomeRepo.getAllIncome(userId, next);
 
     res.status(200).json(income);
   } catch (error) {
@@ -62,13 +43,7 @@ async function getSelectedIncome(req: Request, res: Response, next: NextFunction
     const { id } = req.params;
     const { userId } = verifyToken(req);
 
-    const income = await db.sequelize.query(
-      `SELECT * FROM Incomes WHERE userId = :userId AND id = :id`,
-      {
-        replacements: { userId, id },
-        type: QueryTypes.SELECT,
-      }
-    );
+   const income=await incomeRepo.getSelectedIncome(id, userId, next);
 
     if (!income.length) {
       res.status(404).json({ error: "Income not found" });
@@ -87,13 +62,7 @@ async function deleteSelectedIncome(req: Request, res: Response, next: NextFunct
     const { id } = req.params;
     const { userId } = verifyToken(req);
 
-    const result = await db.sequelize.query(
-      `DELETE FROM Incomes WHERE id = :id AND userId = :userId`,
-      {
-        replacements: { id, userId },
-        type: QueryTypes.DELETE,
-      }
-    );
+    incomeRepo.deleteSelectedIncome(id, userId,next);
 
     res.status(200).json({ message: "Income deleted successfully" });
   } catch (error) {
@@ -107,23 +76,9 @@ async function updateSelectedIncome(req: Request, res: Response, next: NextFunct
     const { id } = req.params;
     const { userId } = verifyToken(req);
     const body = req.body;
-    const updatedAt = new Date();
+    
 
-    if (Object.keys(body).length === 0) {
-      res.status(400).json({ error: "No fields provided for update" });
-      return;
-    }
-
-    const updateFields = Object.keys(body)
-      .map((key) => `${key} = :${key}`)
-      .join(", ");
-
-    const query = `UPDATE Incomes SET ${updateFields}, updatedAt = :updatedAt WHERE id = :id AND userId = :userId`;
-
-    await db.sequelize.query(query, {
-      replacements: { ...body, updatedAt, id, userId },
-      type: QueryTypes.UPDATE,
-    });
+  incomeRepo.updateSelectedIncome(id,userId,body,next);
 
     res.status(201).json({ message: "Income updated successfully" });
   } catch (error) {
