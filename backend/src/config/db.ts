@@ -1,4 +1,10 @@
 import { Sequelize } from "sequelize";
+import dotenv from "dotenv";
+
+// Load environment variables
+dotenv.config();
+
+
 
 const dbName='Finance';
 const dbUser="root";

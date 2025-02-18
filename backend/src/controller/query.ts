@@ -1,27 +1,8 @@
-import jwt, { JwtPayload } from "jsonwebtoken";
+
 import { Request, Response, NextFunction } from "express";
 import db from "../config/db";
 import { QueryTypes, Sequelize } from "sequelize";
-interface PayloadType {
-  userId: number;
-  username: string;
-  email: string;
-  iat: number;
-  exp: number;
-}
-
-const SECRET_KEY = "your_secret_key";
-
-// Helper function to extract and verify JWT token
-const verifyToken = (req: Request): PayloadType => {
-  const rtoken = req.header("Authorization");
-  if (!rtoken) {
-    throw { status: 401, message: "Authorization token is required" };
-  }
-
-  const token = rtoken.replace("Bearer ", "");
-  return jwt.verify(token, SECRET_KEY) as PayloadType;
-};
+import verifyToken from "../helper/verifyToken";
 
 
 async function totalIncome(req: Request, res: Response, next:NextFunction): Promise<void> {

@@ -1,24 +1,19 @@
-import {Request, Response, NextFunction} from "express";
 import validator from "email-validator";
 import bcrypt from "bcrypt";
 import db from "../config/db";
 import { QueryTypes } from "sequelize";
-import { emit } from "process";
-import { error } from "console";
+import userDataType from "../type/userDataType";
+import { NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import userAuthType from "../type/userAuthType";
+import userType from "../type/userType";
+import userModalType from "../type/userModalType";
 
-interface usertype{
-    id:number,
-    username:string,
-    firstname:string,
-    lastname:string,
-    email:string,
-    password:string
-}
-const secretKey = "your_secret_key";
-async function adduser(req: Request, res: Response, next: NextFunction): Promise<void> {
+const SECRET_KEY = process.env.SECRET_KEY as string;
+
+async function addUser(user:userDataType, next:NextFunction): Promise<void> {
     try {
-      const { username, firstname, lastname, email, password } = req.body;
+      const { username, firstname, lastname, email, password } = user;
   
       // Validate required fields
       if (!username) {
@@ -61,26 +56,25 @@ async function adduser(req: Request, res: Response, next: NextFunction): Promise
           type: QueryTypes.INSERT,
         }
       );
-  
-      // Return success response
-      res.status(200).json({ message: 'User successfully added' });
+
+
     } catch (error) {
       // Pass any error to the global error handler middleware
       next(error);
     }
   }
-  
- 
 
-  async function login(req: Request, res: Response, next: NextFunction): Promise<void> {
+
+
+ async function login(userlog:userAuthType, next: NextFunction):Promise<string|void> {
     try {
-      const { email, password } = req.body;
+      const { email, password } = userlog;
   
       if (!email || !password) {
         return next(new Error('Email and password cannot be empty'));
       }
   
-      const user: usertype[] = await db.sequelize.query(`SELECT * FROM Users WHERE email=:email`, {
+      const user: userType[] = await db.sequelize.query(`SELECT * FROM Users WHERE email=:email`, {
         replacements: { email },
         type: QueryTypes.SELECT,
       });
@@ -96,43 +90,43 @@ async function adduser(req: Request, res: Response, next: NextFunction): Promise
   
       const token = jwt.sign(
         { userId: user[0].id, username: user[0].username, email: user[0].email },
-        secretKey,
+        SECRET_KEY,
         { expiresIn: '1h' }
       );
-  
-      res.json({ token });
+       
+      return token as string;
+
     } catch (error) {
       next(error); // Pass to global error handler
     }
   }
-  
-  async function getAllusers(req: Request, res: Response, next: NextFunction): Promise<void> {
+
+  async function getAllUsers(next: NextFunction):Promise<userModalType[]|void> {
     try {
       const users = await db.sequelize.query('SELECT * FROM Users');
-      res.json(users);
+      return users as userModalType[];
     } catch (error) {
       next(error); // Pass to global error handler
     }
   }
-  
-  async function getselecteduser(req: Request, res: Response, next: NextFunction): Promise<void> {
+
+  async function getSelectedUser(id:string, next: NextFunction): Promise<userModalType[]> {
     try {
-      const id = req.params.userId;
       const user = await db.sequelize.query('SELECT * FROM Users WHERE id=:id', {
         replacements: { id },
         type: QueryTypes.SELECT,
       });
+
+      return user as userModalType[];
   
-      res.json(user);
     } catch (error) {
       next(error); // Pass to global error handler
+      return [];
     }
   }
-  
-  async function updateselecteduser(req: Request, res: Response, next: NextFunction): Promise<void> {
+
+  async function updateSelectedUser(id:string, body:userModalType, next: NextFunction): Promise<void> {
     try {
-      const id = req.params.userId;
-      const body = req.body;
       const updatedAt = new Date();
   
       let col = '';
@@ -140,40 +134,25 @@ async function adduser(req: Request, res: Response, next: NextFunction): Promise
         col += `${key}=:${key},`;
       });
   
-      const query = `UPDATE Users SET ${col} updatedAt=:updatedAt`;
+      const query = `UPDATE Users SET ${col} updatedAt=:updatedAt AND id:id`;
   
       await db.sequelize.query(query, {
-        replacements: { updatedAt, ...body },
+        replacements: {  ...body , updatedAt, id},
         type: QueryTypes.UPDATE,
       });
   
-      res.status(200).json({ message: 'Successfully updated the user details' });
     } catch (error) {
       next(error); // Pass to global error handler
     }
   }
   
-  async function logout(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      res.clearCookie('authToken', {
-        path: '/',
-        secure: true,
-        sameSite: 'strict',
-      });
-  
-      res.status(200).json({ message: 'Logged out successfully' });
-    } catch (error) {
-      next(error); // Pass to global error handler
-    }
+  const userRepo={
+    addUser:addUser,
+    login:login,
+    getAllUsers:getAllUsers,
+    getSelectedUser:getSelectedUser,
+    updateSelectedUser:updateSelectedUser
   }
-  
-  const userController = {
-    adduser: adduser,
-    login: login,
-    getAllusers: getAllusers,
-    getselecteduser: getselecteduser,
-    updateselecteduser: updateselecteduser,
-    logout: logout,
-  };
-  
-  export default userController;
+
+  export default userRepo;
+

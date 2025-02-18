@@ -17,8 +17,12 @@ import queryRoutes from "./routes/queryRoutes"
 import swaggerUi from "swagger-ui-express"
 import swaggerJSDoc from "swagger-jsdoc"
 import errorHandler from "./middleware/errorHandler";
+
+
+
 // Load environment variables
 dotenv.config();
+
 
 const app = express();
 
@@ -51,6 +55,8 @@ const swaggerOptions = {
   apis: ["./dist/routes/*.js"], // Ensure this points to your TypeScript route files
 };
 
+
+
 const swaggerSpec = swaggerJSDoc(swaggerOptions);
 app.use(cookieParser());
 
@@ -59,7 +65,7 @@ app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Middleware
 app.use(cors({
-  origin:"http://localhost:5173",
+  origin:"http://localhost:5174",
   credentials:true
 }));
 app.use(express.json());
@@ -90,6 +96,8 @@ db.sequelize
   .catch((error) => {
     console.error("Unable to create tables:", error);
   });
+
+ 
 
   // Start Server
 const PORT = process.env.PORT || 4000;

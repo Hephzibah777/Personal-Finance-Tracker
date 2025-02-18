@@ -16,7 +16,7 @@
 // export default router;
 
 import express from "express";
-import userController from "../controllers/user";
+import userController from "../controller/user";
 import authenticateToken from "../middleware/auth";
 
 const router=express.Router();
@@ -152,11 +152,11 @@ const router=express.Router();
  *           description: User logged out successfully
  */
 
-router.post("/signup",  userController.adduser);
+router.post("/signup",  userController.addUser);
 router.post("/login", userController.login);
-router.get("/users", authenticateToken, userController.getAllusers);
-router.get("/users/:userId", authenticateToken, userController.getselecteduser);
-router.patch("/users/:userId", authenticateToken, userController.updateselecteduser);
+router.get("/users", authenticateToken, userController.getAllUsers);
+router.get("/users/:userId", authenticateToken, userController.getSelectedUser);
+router.patch("/users/:userId", authenticateToken, userController.updateSelectedUser);
 router.post("/logout", userController.logout);
 
 export default router;

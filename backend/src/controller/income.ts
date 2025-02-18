@@ -1,27 +1,15 @@
 
 
 
-import jwt, { JwtPayload } from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 import db from "../config/db";
 import { QueryTypes } from "sequelize";
+import verifyToken from "../helper/verifyToken";
+import dotenv from "dotenv";
 
-interface PayloadType {
-  userId: number;
-  username: string;
-  email: string;
-  iat: number;
-  exp: number;
-}
-
-// Helper function to verify token
-const verifyToken = (req: Request): PayloadType => {
-  const rtoken = req.header("Authorization");
-  if (!rtoken) throw new Error("Authorization token missing");
-  const token = rtoken.replace("Bearer ", "");
-  return jwt.verify(token, "your_secret_key") as PayloadType;
-};
-
+// Load environment variables
+dotenv.config();
+const l= process.env.JWT
 // Add Income
 async function addIncome(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
@@ -52,6 +40,7 @@ async function addIncome(req: Request, res: Response, next: NextFunction): Promi
 // Get All Income
 async function getAllIncome(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
+    console.log(l);
     const { userId } = verifyToken(req);
     const income = await db.sequelize.query(
       `SELECT * FROM Incomes WHERE userId = :userId ORDER BY createdAt DESC LIMIT 5`,

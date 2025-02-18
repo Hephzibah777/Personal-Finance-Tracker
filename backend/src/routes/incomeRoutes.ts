@@ -15,7 +15,7 @@
 
 import express from "express";
 import authenticateToken from "../middleware/auth";
-import incomeController from "../controllers/income";
+import incomeController from "../controller/income";
 
 const router = express.Router();
 

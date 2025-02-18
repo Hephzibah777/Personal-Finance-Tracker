@@ -75,7 +75,7 @@
 
 import express from "express";
 import authenticateToken from "../middleware/auth";
-import queryController from "../controllers/query";
+import queryController from "../controller/query";
 
 const router = express.Router();
 
