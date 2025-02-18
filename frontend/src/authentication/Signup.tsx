@@ -74,8 +74,8 @@ const Signup=()=>{
             <h1 className='text-5xl'>Sign Up</h1>
             <p className='mt-5 text-gray-400'>Plan Today for a Richer Tomorrow</p>
             <div className='mt-10 w-4/5'>
-                <div className='mb-13'>
-                {errors.username?.message && <div className='mb-1 flex justify-end text-red-500 text-sm'>
+                <div className='mb-10 relative'>
+                {errors.username?.message && <div className=' flex justify-end text-red-500 text-sm '>
                        <ErrorIcon/>
                         <p className='pl-2 pr-2'>{errors.username.message as string}</p>
                 </div>}
@@ -93,7 +93,7 @@ const Signup=()=>{
                     </div>
                     <hr className='mt-2 '></hr>
                 </div>
-                <div className='mb-13'>
+                <div className='mb-10 relative'>
                 {errors.firstname?.message && <div className='mb-1 flex justify-end text-red-500 text-sm'>
                        <ErrorIcon/>
                         <p className='pl-2 pr-2'>{errors.firstname.message as string}</p>
@@ -112,7 +112,7 @@ const Signup=()=>{
                     </div>
                     <hr className='mt-2'></hr>
                 </div>
-                <div className='mb-13'>
+                <div className='mb-10'>
                 {errors.lastname?.message && <div className='mb-1 flex justify-end text-red-500 text-sm'>
                        <ErrorIcon/>
                         <p className='pl-2 pr-2'>{errors.lastname.message as string}</p>
@@ -133,7 +133,7 @@ const Signup=()=>{
                 </div>
 
                <div>
-               <div className='mb-13'>
+               <div className='mb-10'>
                {errors.email?.message && <div className='flex justify-end text-red-500 text-sm'>
                        <ErrorIcon/>
                         <p className='pl-2 pr-2'>{errors.email.message as string}</p>
@@ -167,7 +167,7 @@ const Signup=()=>{
                 
                </div>
                
-                <div className='mb-13'>
+                <div className='mb-10'>
                 {errors.password?.message && <div className='mb-1 flex justify-end text-red-500 text-sm'>
                        <ErrorIcon/>
                         <p className='pl-2 pr-2'>{errors.password.message as string}</p>
@@ -194,24 +194,24 @@ const Signup=()=>{
                         },
                         
                         })}
-                    placeholder='Password' className='outline-none' value={formData?.password} name="password" onChange={handleChange}/>
+                    placeholder='Password' type="password" className='outline-none' value={formData?.password} name="password" onChange={handleChange}/>
                     </div>
                     <hr className='mt-2'></hr>
                 </div>
-                <div className='mb-13'>
+                <div className='mb-10'>
                 {checkmsg && <div className='mb-1 flex justify-end text-red-500 text-sm'>
                        <ErrorIcon/>
                         <p className='pl-2 pr-2'>{checkmsg}</p>
                 </div>}
                     <div>
                         <LockOpenIcon className='mr-5'/>
-                    <input placeholder='Retype-Password' className='outline-none' value={formData?.confirmpassword} name="confirmpassword" onBlur={passwordCheck} onChange={handleChange}/>
+                    <input placeholder='Retype-Password' type="password" className='outline-none' value={formData?.confirmpassword} name="confirmpassword" onBlur={passwordCheck} onChange={handleChange}/>
                     </div>
                     <hr className='mt-2'></hr>
                 </div>
             </div>
             <div>
-                <button className='bg-blue-500 pt-3 pb-3 pl-15 pr-15 rounded-3xl text-white'>SignUp</button>
+                <button className='bg-blue-500 pt-3 pb-3 pl-15 pr-15 rounded-3xl text-white cursor-pointer'>SignUp</button>
                 <ToastContainer />
             </div>
            </div>

@@ -12,6 +12,8 @@ async function authenticateToken(req, res, next) {
         console.log(token);
         if (!token) {
             res.status(401).json({ error: "Access denied" });
+            console.log("hello");
+            res.send("/login");
             return;
         }
         const decoded = jsonwebtoken_1.default.verify(token, "your_secret_key");

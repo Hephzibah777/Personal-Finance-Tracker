@@ -122,7 +122,7 @@ async function updateselecteduser(req, res) {
     }
 }
 async function logout(req, res) {
-    console.log(req.cookies.authToken);
+    console.log("hello");
     res.clearCookie("authToken", {
         path: "/",
         secure: true,

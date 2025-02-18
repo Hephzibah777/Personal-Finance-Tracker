@@ -17,6 +17,8 @@ async function authenticateToken(req: Request, res: Response, next:Next):Promise
     console.log(token);
     if (!token){
        res.status(401).json({ error: "Access denied" });
+       console.log("hello");
+       res.send("/login");
        return;
     }
     const decoded = jwt.verify(token, "your_secret_key") as payloadType;

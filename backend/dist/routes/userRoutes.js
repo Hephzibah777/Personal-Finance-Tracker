@@ -134,6 +134,17 @@ const router = express_1.default.Router();
  *       responses:
  *         200:
  *           description: User updated successfully
+ *   /logout:
+ *     post :
+ *       tags:
+ *         - "User Routes"
+ *       summary: Logs out current user
+ *       description: Logs out user
+ *       security:
+ *         - bearerAuth: []
+ *       responses:
+ *         200:
+ *           description: User logged out successfully
  */
 router.post("/signup", user_1.default.adduser);
 router.post("/login", user_1.default.login);

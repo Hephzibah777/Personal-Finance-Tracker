@@ -21,7 +21,7 @@ const router = express_1.default.Router();
  * @swagger
  * tags:
  *   - name: "Income Routes"
- *     description: "Endpoints for managing income records"
+ *     description: "Endpoints for income management"
  *
  * paths:
  *   /incomes:

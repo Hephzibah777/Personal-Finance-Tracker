@@ -9,17 +9,23 @@ import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
 import HelpIcon from '@mui/icons-material/Help';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
+import CustomModal from "./Modal";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 interface statusType{
     option:React.Dispatch<React.SetStateAction<string>>
 }
 const Navbar:React.FC<statusType>=({option})=>{
     const [state, setState]=useState("");
+    const [isModalOpen, setIsModalOpen]=useState(false);
+
 const navigate = useNavigate();
 
     const handleState=(value:string)=>{
         console.log(value);
         option(value);
     }
+
 
     const handleLogOut=async()=>{
       try{
@@ -29,7 +35,9 @@ const navigate = useNavigate();
         }
       }
       catch(error){
-        console.log(error);
+       toast.error("Something went wrong. Please check your internet connection and try again!", {
+                    position: "top-center",
+                  });
       }
     }
   return (
@@ -60,22 +68,30 @@ const navigate = useNavigate();
             <h1>TOOLS</h1>
             <div className="ml-2">
                <div className="mt-4">
-                    <div className="flex gap-3 hover:bg-blue-300 p-3 pr-30 rounded cursor-pointer">
+                    {/* <div className="flex gap-3 hover:bg-blue-300 p-3 pr-30 rounded cursor-pointer">
                         <SettingsSuggestIcon/>
                         <h2>Settings</h2>
                     </div>
                     <div className="flex gap-3  hover:bg-blue-300 p-3 pr-30 rounded cursor-pointer">
                         <HelpIcon/>
                         <h2>HelpCenter</h2>
-                    </div>
+                    </div> */}
                     <div className="flex gap-3 hover:bg-blue-300 p-3 pr-30 rounded cursor-pointer">
                         <LogoutIcon/>
-                        <h2 onClick={handleLogOut}>LogOut</h2>
+                        <h2 onClick={()=>setIsModalOpen(true)}>LogOut</h2>
                     </div>
                </div>
             </div>
           </div>
         </div>
+       <CustomModal
+           open={isModalOpen}
+           onClose={()=>setIsModalOpen(false)}
+           onConfirm={handleLogOut}
+           title="Confirm Action"
+           message="Are you sure you want to log out?"
+           />
+           <ToastContainer />
       </div>
     </>
   );

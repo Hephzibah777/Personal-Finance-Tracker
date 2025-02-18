@@ -83,5 +83,8 @@ router.get("/totalincome", authenticateToken, queryController.totalincome);
 router.get("/totalexpense", authenticateToken, queryController.totalexpense);
 router.get("/month/:year", authenticateToken, queryController.getByMonth);
 router.get("/categorydata", authenticateToken, queryController.getByCategory);
+router.get("/incomesdesc", authenticateToken, queryController.getdescincomes);
+router.get("/expensesdesc", authenticateToken, queryController.getdescexpenses);
+router.get("/categoryper", authenticateToken, queryController.getcategorypercentage);
 
 export default router;

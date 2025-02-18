@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useState } from 'react'
 import './App.css'
-import Signup from './components/Signup'
-import Login from "./components/Login";
+import Signup from './authentication/Signup'
+import Login from "./authentication/Login";
 import Home from "./dashboard/Home"
 function App() {
 

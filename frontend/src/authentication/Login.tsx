@@ -9,9 +9,12 @@ import { useNavigate } from 'react-router-dom';
 import Cookies from "js-cookie"
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 const Login=()=>{
      const [loginData, setLoginData]=useState<loginType|null>(null);
+     const [showPassword, setShowPassword]=useState(false);
+
      const navigate = useNavigate();
      const handleChange=(event:React.ChangeEvent<HTMLInputElement>)=>{
         const name=event.target.name;
@@ -34,6 +37,11 @@ const Login=()=>{
                 sameSite: 'strict'
               });
               setTimeout(()=>navigate("/home"), 2000);
+           }
+           else if(response.status==400){
+            toast.error("Wrong Password!", {
+                position: "top-center",
+              });
            }
 
         }
@@ -66,15 +74,22 @@ const Login=()=>{
                     <hr className='mt-2'></hr>
                 </div>
                 <div className='mb-13'>
+                    <div className='flex justify-between'>
                     <div>
                         <LockOpenIcon className='mr-5'/>
-                    <input placeholder='Password' className='outline-none' value={loginData?.password} onChange={handleChange} name="password"/>
+                    <input placeholder='Password' type={showPassword==true?"text":"password"} 
+                    className='outline-none' value={loginData?.password} onChange={handleChange} name="password"/>
+                    </div>
+                    <div className='cursor-pointer' onClick={() => setShowPassword(!showPassword)}>
+                        <VisibilityIcon/>
+                    </div>
                     </div>
                     <hr className='mt-2'></hr>
+                    
                 </div>
             </div>
             <div>
-                <button className='bg-blue-500 pt-3 pb-3 pl-15 pr-15 text-white rounded-3xl'>Log In</button>
+                <button className='bg-blue-500 pt-3 pb-3 pl-15 pr-15 text-white rounded-3xl cursor-pointer'>Log In</button>
             </div>
             <ToastContainer />
            </div>

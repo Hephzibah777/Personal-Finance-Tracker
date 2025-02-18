@@ -33,7 +33,7 @@ const AddTrans:React.FC<{edit:updateType}>=({edit})=> {
         alert("Error fetching categories data");
       }
     };
-    getCategories();
+   
 
     const checkUpdate=async()=>{
         if(edit.id!=-1){
@@ -48,7 +48,7 @@ const AddTrans:React.FC<{edit:updateType}>=({edit})=> {
             }
         }
     }
-
+    getCategories();
     checkUpdate();
   }, [edit]);
 
@@ -172,7 +172,7 @@ const AddTrans:React.FC<{edit:updateType}>=({edit})=> {
       setExpenseData({id:"", amount:"", category:"", description:""});
     }
     catch(error){
-      toast.error("Something went wrong. Please check your internet connection and try again!", {
+       toast.error("Something went wrong. Please check your internet connection and try again!", {
         position: "top-center",
       });
     }
@@ -265,7 +265,6 @@ const AddTrans:React.FC<{edit:updateType}>=({edit})=> {
               </div>
             </div>
           </form>
-           <ToastContainer />
         </div>
       </div>
     </>

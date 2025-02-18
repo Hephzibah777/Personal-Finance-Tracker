@@ -101,9 +101,10 @@ async function totalincome(req: Request, res: Response): Promise<void> {
       const token = rtoken!.replace("Bearer ", "");
       const decoded = jwt.verify(token, "your_secret_key") as payloadType;
       const userId=decoded.userId;
+      const month=new Date().getMonth()+1;
     
-      const response=await db.sequelize.query(`select description, amount from Incomes where userId=:userId order by amount DESC LIMIT 3;`,{
-        replacements:{userId:userId},
+      const response=await db.sequelize.query(`select description, amount from Incomes where userId=:userId AND month(createdAt)=:month order by amount DESC LIMIT 3;`,{
+        replacements:{userId:userId, month:month},
         type:QueryTypes.SELECT
       })
 
@@ -115,12 +116,59 @@ async function totalincome(req: Request, res: Response): Promise<void> {
     }
   }
 
+  async function getdescexpenses(req: Request, res: Response): Promise<void> {
+    try {
+        
+      const rtoken = req.header("Authorization");
+      const token = rtoken!.replace("Bearer ", "");
+      const decoded = jwt.verify(token, "your_secret_key") as payloadType;
+      const userId=decoded.userId;
+      const month=new Date().getMonth()+1;
+    
+      const response=await db.sequelize.query(`select category, amount from Expenses where userId=:userId AND month(createdAt)=:month order by amount DESC LIMIT 3;`,{
+        replacements:{userId:userId, month:month},
+        type:QueryTypes.SELECT
+      })
+
+     res.send(response);
+     
+  
+    } catch (error) {
+      res.status(500).json({error:"Internal Server Error"});
+    }
+  }
+
+  async function getcategorypercentage(req: Request, res: Response): Promise<void> {
+    try {
+        
+      const rtoken = req.header("Authorization");
+      const token = rtoken!.replace("Bearer ", "");
+      const decoded = jwt.verify(token, "your_secret_key") as payloadType;
+      const userId=decoded.userId;
+      const month=new Date().getMonth()+1;
+    
+      const response=await db.sequelize.query(`Select SUM(amount)/(Select SUM(amount) FROM Incomes where userId=:userId and month(createdAt)=:month)*100 percentage FROM Expenses where userId=:userId and month(createdAt)=:month`,{
+        replacements:{userId:userId, month:month},
+        type:QueryTypes.SELECT
+      })
+
+     res.send(response);
+     
+  
+    } catch (error) {
+      res.status(500).json({error:"Internal Server Error"});
+    }
+  }
+
+
   const queryController={
     totalincome:totalincome,
     totalexpense:totalexpense,
     getByMonth:getByMonth,
     getByCategory:getByCategory,
-    getdescincomes:getdescincomes
+    getdescincomes:getdescincomes,
+    getdescexpenses:getdescexpenses,
+    getcategorypercentage:getcategorypercentage
   }
 
   export default queryController;

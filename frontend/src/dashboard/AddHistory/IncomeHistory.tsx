@@ -6,12 +6,15 @@ import incomeDataType from "../../interfaces/incomeDataType";
 import updateType from "../../interfaces/updateType";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import CustomModal from "../Modal";
 
 interface ComponentType{
     edit:React.Dispatch<React.SetStateAction<updateType>>
 }
 const IncomeHistory:React.FC<ComponentType>=({edit})=>{
     const[incomeData, setIncomeData]=useState<incomeDataType[]>([]);
+     const [isModalOpen, setIsModalOpen]=useState(false);
+      const [deleteId, setDeleteId]=useState(-1);
 
     const token = Cookies.get("authToken");
     const config = {
@@ -37,8 +40,15 @@ const IncomeHistory:React.FC<ComponentType>=({edit})=>{
     edit({type:"income", id:value});
   }
 
-  const handleDelete=async(value:number)=>{
+  const handleDeleteConfirm=(value:number)=>{
+    setDeleteId(value);
+    setIsModalOpen(true);
+  }
+
+  const handleDelete=async()=>{
     try{
+      setIsModalOpen(false);
+      const value=deleteId;
       const response=await axios.delete(`http://localhost:4000/incomes/${value}`, config)
       if(response.status==200){
           toast.success("Deleted successfully !", {
@@ -74,7 +84,7 @@ const IncomeHistory:React.FC<ComponentType>=({edit})=>{
                           <td className="border p-4 border-gray-400">
                               <div className="flex gap-3">
                                   <button className="border border-green-600 p-3 pl-10 pr-10 rounded-2xl cursor-pointer" onClick={() => handleEdit(key.id as number)}>Edit</button>
-                                  <button className="border border-red-600 p-3 pl-10 pr-10 rounded-2xl cursor-pointer" onClick={() => handleDelete(key.id as number)}>Delete</button>
+                                  <button className="border border-red-600 p-3 pl-10 pr-10 rounded-2xl cursor-pointer" onClick={() => handleDeleteConfirm(key.id as number)}>Delete</button>
                               </div>
                           </td>
                       </tr>
@@ -83,6 +93,13 @@ const IncomeHistory:React.FC<ComponentType>=({edit})=>{
             </tbody>
           </table>
           <ToastContainer />
+          <CustomModal
+           open={isModalOpen}
+           onClose={()=>setIsModalOpen(false)}
+           onConfirm={handleDelete}
+           title="Confirm Action"
+           message="Are you sure you want to Delete?"
+           />
         </div>
         </>
     )

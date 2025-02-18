@@ -15,6 +15,8 @@ import {
 } from "chart.js";
 import catperDataType from "../interfaces/catperDataType";
 import ChartDataLabels from "chartjs-plugin-datalabels";
+import incomeDescType from "../interfaces/incomeDescType";
+import expenseDescType from "../interfaces/expenseDescType";
 
 ChartJS.register(
   CategoryScale,
@@ -35,6 +37,9 @@ function Analysis() {
   const [totalincome, setTotalIncome]=useState(0);
   const [totalexpense, setTotalExpense]=useState(0);
   const [totalbalance, setTotalBalance]=useState(0);
+  const [incomedesc, setIncomeDesc]=useState<incomeDescType[]>([]);
+  const [expensedesc, setExpenseDesc]=useState<expenseDescType[]>([]);
+  const [expensePer, setExpensePer]=useState(0);
   const dataPattern = {
     labels: [
       "Jan",
@@ -116,12 +121,33 @@ function Analysis() {
 
         const responseexpense=await axios.get(`http://localhost:4000/totalexpense`,config);
         setTotalExpense(responseexpense.data[0].expense);
+
+        const responseper=await axios.get(`http://localhost:4000/categoryper`,config);
+       setExpensePer(responseper.data[0].percentage);
+      }
+
+      const fetchcategorydesc=async()=>{
+        try{
+          const responseincome=await axios.get(`http://localhost:4000/incomesdesc`,config);
+          console.log(responseincome.data);
+          setIncomeDesc(responseincome.data);
+
+          const responsexpense=await axios.get(`http://localhost:4000/expensesdesc`,config);
+          setExpenseDesc(responsexpense.data);
+
+        }
+        catch(error){
+
+        }
       }
 
 
       fetchdata();
       fetchcategoryper();
-    } catch (error) {}
+      fetchcategorydesc();
+    } catch (error) {
+
+    }
   }, []);
 
   useEffect(()=>{
@@ -143,6 +169,7 @@ function Analysis() {
   })
   const handleChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
     setYear(event.target.value);
+    console.log(event.target.value);
     try {
       const response = await axios.get(
         `http://localhost:4000/month/${year}`,
@@ -151,6 +178,8 @@ function Analysis() {
       console.log(response.data);
       const incomeData = response.data.map((key: dataType) => key.incomes);
       const expenseData = response.data.map((key: dataType) => key.expenses);
+      incomeData.unshift(0);
+      expenseData.unshift(0);
       setExpenseData(expenseData);
       setData(incomeData);
     } catch (error) {}
@@ -180,7 +209,7 @@ function Analysis() {
           <div className="border border-gray-400 rounded-2xl w-1/3 p-3">
             <div className="flex justify-between">
               <h1 className="font-bold">My Income</h1>
-              <h2>July 2025</h2>
+              <h2>February 2025</h2>
             </div>
             <div className="mt-15">
               <h3 className="text-gray-400 mb-2">Total income</h3>
@@ -188,31 +217,22 @@ function Analysis() {
               {totalincome !==null ? `Rs ${totalincome}`:"No Data"}
               </h1>
               <div className="flex mt-5 ">
-                <div className="border-x border-blue-400 pr-12 pl-3 ">
-                  <div>
-                    <h1>Salary</h1>
-                    <h3>20000</h3>
-                  </div>
-                </div>
-                <div className="border-x border-blue-400 pr-12 pl-3 ">
-                  <div>
-                    <h1>Salary</h1>
-                    <h3>20000</h3>
-                  </div>
-                </div>
-                <div className="border-x border-blue-400 pr-12 pl-3 ">
-                  <div>
-                    <h1>Salary</h1>
-                    <h3>20000</h3>
-                  </div>
-                </div>
+                {incomedesc.map((key)=>(
+                   <div className="border-x border-blue-400 pr-12 pl-3 ">
+                   <div>
+                     <h1>{key.description}</h1>
+                     <h3>{key.amount}</h3>
+                   </div>
+                 </div>
+                ))}
+               
               </div>
             </div>
           </div>
           <div className="border border-gray-400 rounded-2xl w-1/3 p-3">
             <div className="flex justify-between">
               <h1 className="font-bold">My Expense</h1>
-              <h2>July 2025</h2>
+              <h2>February 2025</h2>
             </div>
             <div className="mt-15">
               <h3 className="text-gray-400 mb-2">Total expense</h3>
@@ -220,24 +240,15 @@ function Analysis() {
               {totalexpense !==null ? `Rs ${totalexpense}`:"No Data"}
               </h1>
               <div className="flex mt-5 ">
-                <div className="border-x border-blue-400 pr-12 pl-3 ">
-                  <div>
-                    <h1>Salary</h1>
-                    <h3>20000</h3>
-                  </div>
-                </div>
-                <div className="border-x border-blue-400 pr-12 pl-3 ">
-                  <div>
-                    <h1>Salary</h1>
-                    <h3>20000</h3>
-                  </div>
-                </div>
-                <div className="border-x border-blue-400 pr-12 pl-3 ">
-                  <div>
-                    <h1>Salary</h1>
-                    <h3>20000</h3>
-                  </div>
-                </div>
+              {expensedesc.map((key)=>(
+                   <div className="border-x border-blue-400 pr-12 pl-3 ">
+                   <div>
+                     <h1>{key.category}</h1>
+                     <h3>{key.amount}</h3>
+                   </div>
+                 </div>
+                ))}
+               
               </div>
             </div>
           </div>
@@ -249,7 +260,7 @@ function Analysis() {
               <select className="p-2" onChange={handleChange}>
                 <option>Year</option>
                 <option>2025</option>
-                <option>2024</option>
+                {/* <option>2024</option> */}
               </select>
             </div>
             <div className="w-full h-full ml-10 pb-10 p-5">
@@ -281,7 +292,7 @@ function Analysis() {
           </div>
           <div className="border border-gray-400 rounded-2xl w-1/3 p-3">
           <h1 className="font-bold">Categorical Breakdown</h1>
-          <h1 className="mt-5 text-6xl font-bold ">20%</h1>
+          <h1 className="mt-5 text-6xl font-bold ">{expensePer}%</h1>
             <div className="mt-20">
               <Bar
                 data={categoryPattern}

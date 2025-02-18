@@ -80,8 +80,43 @@ async function getdescincomes(req, res) {
         const token = rtoken.replace("Bearer ", "");
         const decoded = jsonwebtoken_1.default.verify(token, "your_secret_key");
         const userId = decoded.userId;
-        const response = await db_1.default.sequelize.query(`select description, amount from Incomes where userId=:userId order by amount DESC LIMIT 3;`, {
-            replacements: { userId: userId },
+        const month = new Date().getMonth() + 1;
+        const response = await db_1.default.sequelize.query(`select description, amount from Incomes where userId=:userId AND month(createdAt)=:month order by amount DESC LIMIT 3;`, {
+            replacements: { userId: userId, month: month },
+            type: sequelize_1.QueryTypes.SELECT
+        });
+        res.send(response);
+    }
+    catch (error) {
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+}
+async function getdescexpenses(req, res) {
+    try {
+        const rtoken = req.header("Authorization");
+        const token = rtoken.replace("Bearer ", "");
+        const decoded = jsonwebtoken_1.default.verify(token, "your_secret_key");
+        const userId = decoded.userId;
+        const month = new Date().getMonth() + 1;
+        const response = await db_1.default.sequelize.query(`select category, amount from Expenses where userId=:userId AND month(createdAt)=:month order by amount DESC LIMIT 3;`, {
+            replacements: { userId: userId, month: month },
+            type: sequelize_1.QueryTypes.SELECT
+        });
+        res.send(response);
+    }
+    catch (error) {
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+}
+async function getcategorypercentage(req, res) {
+    try {
+        const rtoken = req.header("Authorization");
+        const token = rtoken.replace("Bearer ", "");
+        const decoded = jsonwebtoken_1.default.verify(token, "your_secret_key");
+        const userId = decoded.userId;
+        const month = new Date().getMonth() + 1;
+        const response = await db_1.default.sequelize.query(`Select SUM(amount)/(Select SUM(amount) FROM Incomes where userId=:userId and month(createdAt)=:month)*100 percentage FROM Expenses where userId=:userId and month(createdAt)=:month`, {
+            replacements: { userId: userId, month: month },
             type: sequelize_1.QueryTypes.SELECT
         });
         res.send(response);
@@ -95,6 +130,8 @@ const queryController = {
     totalexpense: totalexpense,
     getByMonth: getByMonth,
     getByCategory: getByCategory,
-    getdescincomes: getdescincomes
+    getdescincomes: getdescincomes,
+    getdescexpenses: getdescexpenses,
+    getcategorypercentage: getcategorypercentage
 };
 exports.default = queryController;

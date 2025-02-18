@@ -6,6 +6,7 @@ import Cookies from "js-cookie";
 import updateType from "../../interfaces/updateType";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import CustomModal from "../Modal";
 
 interface ComponentType {
   edit: React.Dispatch<React.SetStateAction<updateType>>;
@@ -13,6 +14,8 @@ interface ComponentType {
 
 const ExpenseHistory: React.FC<ComponentType> = ({ edit }) => {
   const [expenseData, setExpenseData] = useState<expenseDataType[]>([]);
+  const [isModalOpen, setIsModalOpen]=useState(false);
+  const [deleteId, setDeleteId]=useState(-1);
   const token = Cookies.get("authToken");
   const config = {
     headers: {
@@ -38,8 +41,15 @@ const ExpenseHistory: React.FC<ComponentType> = ({ edit }) => {
     edit({ type: "expense", id: value });
   };
 
-  const handleDelete = async (value: number) => {
+  const handleDeleteConfirm=(value:number)=>{
+    setDeleteId(value);
+    setIsModalOpen(true);
+  }
+
+  const handleDelete = async () => {
     try {
+      setIsModalOpen(false);
+      const value=deleteId;
       const response = await axios.delete(
         `http://localhost:4000/expenses/${value}`,
         config
@@ -92,7 +102,7 @@ const ExpenseHistory: React.FC<ComponentType> = ({ edit }) => {
                     </button>
                     <button
                       className="border border-red-600 p-3 pl-7 pr-7 rounded-2xl cursor-pointer"
-                      onClick={() => handleDelete(key.id as number)}
+                      onClick={() => handleDeleteConfirm(key.id as number)}
                     >
                       Delete
                     </button>
@@ -103,6 +113,13 @@ const ExpenseHistory: React.FC<ComponentType> = ({ edit }) => {
           </tbody>
         </table>
          <ToastContainer />
+         <CustomModal
+           open={isModalOpen}
+           onClose={()=>setIsModalOpen(false)}
+           onConfirm={handleDelete}
+           title="Confirm Action"
+           message="Are you sure you want to delete?"
+           />
       </div>
     </>
   );

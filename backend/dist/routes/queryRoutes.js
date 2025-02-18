@@ -81,4 +81,7 @@ router.get("/totalincome", auth_1.default, query_1.default.totalincome);
 router.get("/totalexpense", auth_1.default, query_1.default.totalexpense);
 router.get("/month/:year", auth_1.default, query_1.default.getByMonth);
 router.get("/categorydata", auth_1.default, query_1.default.getByCategory);
+router.get("/incomesdesc", auth_1.default, query_1.default.getdescincomes);
+router.get("/expensesdesc", auth_1.default, query_1.default.getdescexpenses);
+router.get("/categoryper", auth_1.default, query_1.default.getcategorypercentage);
 exports.default = router;

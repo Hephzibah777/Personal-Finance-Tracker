@@ -139,6 +139,17 @@ const router=express.Router();
  *       responses:
  *         200:
  *           description: User updated successfully
+ *   /logout:
+ *     post :
+ *       tags:
+ *         - "User Routes"
+ *       summary: Logs out current user
+ *       description: Logs out user
+ *       security:
+ *         - bearerAuth: []
+ *       responses:
+ *         200:
+ *           description: User logged out successfully
  */
 
 router.post("/signup",  userController.adduser);

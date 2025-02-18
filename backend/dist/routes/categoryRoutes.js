@@ -53,5 +53,5 @@ const router = express_1.default.Router();
  *           description: List of categories retrieved successfully
  */
 router.post("/categories", auth_1.default, category_1.default.addcategory);
-router.get("/categories", auth_1.default, category_1.default.getAllcategory);
+router.get("/categories", category_1.default.getAllcategory);
 exports.default = router;

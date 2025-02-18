@@ -51,7 +51,7 @@ async function getAllexpense(req, res) {
         const token = rtoken.replace("Bearer ", "");
         const decoded = jsonwebtoken_1.default.verify(token, "your_secret_key");
         const userId = decoded.userId;
-        const expense = await db_1.default.sequelize.query(`SELECT * From Expenses where userId=:userId`, {
+        const expense = await db_1.default.sequelize.query(`SELECT * From Expenses where userId=:userId ORDER BY createdAt DESC LIMIT 5`, {
             replacements: { userId: userId },
             type: sequelize_1.QueryTypes.SELECT
         });

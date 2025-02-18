@@ -145,7 +145,7 @@ async function updateselecteduser(req:Request, res:Response):Promise<void>{
 }
 
 async function logout(req:Request, res:Response):Promise<void>{
-    console.log(req.cookies.authToken);
+    console.log("hello");
     res.clearCookie("authToken",{
         path:"/",
         secure:true,

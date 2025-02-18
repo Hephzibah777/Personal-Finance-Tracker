@@ -34,7 +34,7 @@ async function getAllincome(req, res) {
         const token = rtoken.replace("Bearer ", "");
         const decoded = jsonwebtoken_1.default.verify(token, "your_secret_key");
         const userId = decoded.userId;
-        const income = await db_1.default.sequelize.query(`SELECT * From Incomes where userId=:userId`, {
+        const income = await db_1.default.sequelize.query(`SELECT * From Incomes where userId=:userId ORDER BY createdAt DESC LIMIT 5`, {
             replacements: { userId: userId },
             type: sequelize_1.QueryTypes.SELECT
         });
@@ -51,7 +51,7 @@ async function getselectedincome(req, res) {
         const token = rtoken.replace("Bearer ", "");
         const decoded = jsonwebtoken_1.default.verify(token, "your_secret_key");
         const userId = decoded.userId;
-        const income = await db_1.default.sequelize.query(`SELECT * From Incomes where userId=:userId AND id=:id`, {
+        const income = await db_1.default.sequelize.query(`SELECT * From Incomes where userId=:userId AND id=:id `, {
             replacements: { userId: userId, id: id },
             type: sequelize_1.QueryTypes.SELECT
         });
@@ -68,7 +68,7 @@ async function deleteselectedincome(req, res) {
         const token = rtoken.replace("Bearer ", "");
         const decoded = jsonwebtoken_1.default.verify(token, "your_secret_key");
         const userId = decoded.userId;
-        const income = await db_1.default.sequelize.query(`DELETE FROM Incomes WHERE id=:id AND userId=:userId`, {
+        const income = await db_1.default.sequelize.query(`DELETE FROM Incomes WHERE id=:id AND userId=:userId `, {
             replacements: { id: id, userId: userId },
             type: sequelize_1.QueryTypes.DELETE
         });

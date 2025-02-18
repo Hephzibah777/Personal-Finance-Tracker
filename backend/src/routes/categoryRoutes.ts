@@ -55,6 +55,6 @@ const router = express.Router();
  */
 
 router.post("/categories", authenticateToken, categoryController.addcategory);
-router.get("/categories", authenticateToken, categoryController.getAllcategory);
+router.get("/categories",  categoryController.getAllcategory);
 
 export default router;
