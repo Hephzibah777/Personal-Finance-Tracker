@@ -7,7 +7,9 @@ import updateType from "../../interfaces/updateType";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import CustomModal from "../Modal";
-
+/**Interface defining the expected props for the ExpenseHistory component 
+ * containing the id of the row that has to be updated in income table
+**/
 interface ComponentType{
     edit:React.Dispatch<React.SetStateAction<updateType>>
 }
@@ -36,6 +38,7 @@ const IncomeHistory:React.FC<ComponentType>=({edit})=>{
      fetchData();
   }, [])
 
+    // Function to handle deletion of an income entry
   const handleEdit=(value:number)=>{
     edit({type:"income", id:value});
   }
@@ -45,6 +48,8 @@ const IncomeHistory:React.FC<ComponentType>=({edit})=>{
     setIsModalOpen(true);
   }
 
+
+    // Function to handle deletion of an eincome entry
   const handleDelete=async()=>{
     try{
       setIsModalOpen(false);

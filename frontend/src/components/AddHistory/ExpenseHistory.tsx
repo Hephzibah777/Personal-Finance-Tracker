@@ -9,6 +9,10 @@ import "react-toastify/dist/ReactToastify.css";
 import CustomModal from "../Modal";
 import { useUserContext } from "../../hooks/UserProvider";
 
+/**Interface defining the expected props for the ExpenseHistory component 
+ * containing the id of the row that has to be updated in expense table
+ * The component is used to display all the expense of a particular user
+**/
 interface ComponentType {
   edit: React.Dispatch<React.SetStateAction<updateType>>;
 }
@@ -40,6 +44,8 @@ const ExpenseHistory: React.FC<ComponentType> = ({ edit }) => {
     fetchData();
   }, [counter]);
 
+
+    // Function to handle update of an expense entry
   const handleEdit = (value: number) => {
     edit({ type: "expense", id: value });
   };
@@ -49,6 +55,7 @@ const ExpenseHistory: React.FC<ComponentType> = ({ edit }) => {
     setIsModalOpen(true);
   }
 
+    // Function to handle deletion of an expense entry
   const handleDelete = async () => {
     try {
       setIsModalOpen(false);

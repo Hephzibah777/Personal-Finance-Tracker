@@ -11,6 +11,16 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
+
+/**
+ * Login Component
+ * 
+ * This component handles user login by:
+ * - Accepting email and password inputs.
+ * - Sending login data to the backend API.
+ * - Storing authentication token in cookies upon successful login.
+ * - Providing user-friendly toast notifications for success and errors.
+ */
 const Login=()=>{
      const [loginData, setLoginData]=useState<loginType|null>(null);
      const [showPassword, setShowPassword]=useState(false);
