@@ -91,7 +91,7 @@ async function addUser(user:userDataType, next:NextFunction): Promise<void> {
       const token = jwt.sign(
         { userId: user[0].id, username: user[0].username, email: user[0].email },
         SECRET_KEY,
-        { expiresIn: '1h' }
+        { expiresIn: '10h' }
       );
        
       return token as string;

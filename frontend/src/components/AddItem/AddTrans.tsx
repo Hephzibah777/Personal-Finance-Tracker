@@ -204,6 +204,8 @@ const AddTrans: React.FC<{ edit: updateType }> = ({ edit }) => {
   - Resets the `incomeData` state to clear the form after submission.
   - Catches and handles errors by displaying an error notification.
 */
+
+
   const handleAddIncome = async (event: React.FormEvent<HTMLFormElement>) => {
     try {
       event.preventDefault();
@@ -280,7 +282,7 @@ const AddTrans: React.FC<{ edit: updateType }> = ({ edit }) => {
           toast.success("Expense updated successfully!", {
             position: "top-center",
           });
-          setCounter(!counter);
+       
         }
         edit.id = -1;
         edit.type = "";
@@ -291,13 +293,13 @@ const AddTrans: React.FC<{ edit: updateType }> = ({ edit }) => {
           config
         );
         if (response.status == 200) {
-          setShowToast(true);
-          // const toastvar = toast.success("New expense added successfully!", {
-          //   position: "top-center",
-          //   autoClose: 3000,
-          // });
           
-          setCounter(!counter);
+         toast.success("New expense added successfully!", {
+            position: "top-center",
+            autoClose: 3000,
+          });
+          
+          
         }
       }
       setExpenseData({ id: "", amount: "", category: "", description: "" });

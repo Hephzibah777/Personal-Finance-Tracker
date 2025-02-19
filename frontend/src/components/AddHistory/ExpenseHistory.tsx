@@ -30,19 +30,22 @@ const ExpenseHistory: React.FC<ComponentType> = ({ edit }) => {
     },
   };
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:4000/expenses",
-          config
-        );
-        setExpenseData(response.data);
-      } catch (error) {
-        alert(error);
-      }
-    };
+   
     fetchData();
-  }, [counter]);
+  }, [expenseData]);
+
+  const fetchData = async () => {
+    try {
+      console.log("hello");
+      const response = await axios.get(
+        "http://localhost:4000/expenses",
+        config
+      );
+      setExpenseData(response.data);
+    } catch (error) {
+      alert(error);
+    }
+  };
 
 
     // Function to handle update of an expense entry

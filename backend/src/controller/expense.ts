@@ -8,7 +8,12 @@ import verifyToken from "../helper/verifyToken";
 import expenseRepo from "../repositary/expense";
 
 
-// Add Expense
+/**
+ * Adds a new expense to the database.
+ * @param req - Express request object containing expense details (amount, category, description).
+ * @param res - Express response object.
+ * @param next - Express next function for error handling.
+ */
 async function addExpense(req: Request, res: Response, next: NextFunction):Promise<void> {
   try {
     const { amount, category, description } = req.body;
@@ -26,7 +31,12 @@ async function addExpense(req: Request, res: Response, next: NextFunction):Promi
   }
 }
 
-// Get Selected Expense
+/**
+ * Retrieves a specific expense by ID.
+ * @param req - Express request object containing expense ID in params.
+ * @param res - Express response object.
+ * @param next - Express next function for error handling.
+ */
 async function getSelectedExpense(req: Request, res: Response, next: NextFunction):Promise<void> {
   try {
     const { id } = req.params;
@@ -44,7 +54,12 @@ async function getSelectedExpense(req: Request, res: Response, next: NextFunctio
   }
 }
 
-//  Get All Expenses (Latest 5)
+/**
+ * Retrieves the latest 5 expenses for the logged-in user.
+ * @param req - Express request object.
+ * @param res - Express response object containing all expenses for a particular user
+ * @param next - Express next function for error handling.
+ */
 async function getAllExpense(req: Request, res: Response, next: NextFunction):Promise<void> {
   try {
     const { userId } = verifyToken(req);
@@ -57,7 +72,12 @@ async function getAllExpense(req: Request, res: Response, next: NextFunction):Pr
   }
 }
 
-//  Delete Expense
+/**
+ * Deletes a selected expense by ID.
+ * @param req - Express request object containing expense ID in params.
+ * @param res - Express response object.
+ * @param next - Express next function for error handling.
+ */
 async function deleteSelectedExpense(req: Request, res: Response, next: NextFunction):Promise<void> {
   try {
     const { id } = req.params;
@@ -68,7 +88,12 @@ async function deleteSelectedExpense(req: Request, res: Response, next: NextFunc
   }
 }
 
-//  Update Expense
+/**
+ * Updates a selected expense by ID.
+ * @param req - Express request object containing updated expense details in the body.
+ * @param res - Express response object.
+ * @param next - Express next function for error handling.
+ */
 async function updateSelectedExpense(req: Request, res: Response, next: NextFunction):Promise<void> {
   try {
     const { id } = req.params;

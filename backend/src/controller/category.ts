@@ -2,6 +2,13 @@ import { Request, Response, NextFunction } from "express";
 import db from "../config/db";
 import { QueryTypes } from "sequelize";
 
+
+/**
+ * Adds a new category to the database.
+ * @param req - Express request object containing category and amount in the body.
+ * @param res - Express response object.
+ * @param next - Express next function for error handling.
+ */
 async function addCategory(req: Request, res: Response, next:NextFunction): Promise<void> {
   try {
     const {name}= req.body;
@@ -18,6 +25,13 @@ async function addCategory(req: Request, res: Response, next:NextFunction): Prom
     next(error);
   }
 }
+
+/**
+ * Retrieves all categories from the database.
+ * @param req - Express request object.
+ * @param res - Express response object.
+ * @param next - Express next function for error handling.
+ */
 
 async function getAllCategory(req: Request, res: Response, next:NextFunction): Promise<void> {
   try {

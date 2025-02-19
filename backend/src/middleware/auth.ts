@@ -10,6 +10,7 @@ interface payloadType{
     iat:number,
     exp:number,
 }
+
 async function authenticateToken(req: Request, res: Response, next:Next):Promise<void> {
   try {
     const rtoken = req.header("Authorization");
@@ -22,8 +23,7 @@ async function authenticateToken(req: Request, res: Response, next:Next):Promise
        return;
     }
     const decoded = jwt.verify(token, "your_secret_key") as payloadType;
-    // req.body.userId = decoded.userId;
-    // res.json({ status: true, user: decoded.username })
+  
     next();
   } catch (error) {
     console.log(error);

@@ -12,7 +12,13 @@ import expenseRepo from "../repositary/expense";
 // Load environment variables
 dotenv.config();
 
-// Add Income
+/**
+ * Adds a new income record for the authenticated user.
+ * 
+ * @param req - Express request object containing amount and description in the body.
+ * @param res - Express response object to send the success message.
+ * @param next - Express next function to handle errors.
+ */
 async function addIncome(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { amount, description } = req.body;
@@ -25,7 +31,13 @@ async function addIncome(req: Request, res: Response, next: NextFunction): Promi
   }
 }
 
-// Get All Income
+/**
+ * Retrieves a specific income record by its ID.
+ * 
+ * @param req - Express request object containing the income ID in params.
+ * @param res - Express response object containing the selected income details.
+ * @param next - Express next function to handle errors.
+ */
 async function getAllIncome(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { userId } = verifyToken(req);
@@ -37,7 +49,13 @@ async function getAllIncome(req: Request, res: Response, next: NextFunction): Pr
   }
 }
 
-// Get Selected Income
+/**
+ * Retrieves a specific income record by its ID.
+ * 
+ * @param req - Express request object containing the income ID in params.
+ * @param res - Express response object containing the selected income details.
+ * @param next - Express next function to handle errors.
+ */
 async function getSelectedIncome(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { id } = req.params;
@@ -56,7 +74,13 @@ async function getSelectedIncome(req: Request, res: Response, next: NextFunction
   }
 }
 
-// Delete Selected Income
+/**
+ * Deletes a specific income record by its ID.
+ * 
+ * @param req - Express request object containing the income ID in params.
+ * @param res - Express response object containing a success message.
+ * @param next - Express next function to handle errors.
+ */
 async function deleteSelectedIncome(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { id } = req.params;
@@ -70,7 +94,13 @@ async function deleteSelectedIncome(req: Request, res: Response, next: NextFunct
   }
 }
 
-// Update Selected Income
+/**
+ * Updates a specific income record by its ID.
+ * 
+ * @param req - Express request object containing the income ID in params and update data in the body.
+ * @param res - Express response object containing a success message.
+ * @param next - Express next function to handle errors.
+ */
 async function updateSelectedIncome(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { id } = req.params;
