@@ -34,7 +34,7 @@ const AddTrans: React.FC<{ edit: updateType }> = ({ edit }) => {
     null
   );
   const [showToast, setShowToast] = useState(false);
-  const { counter, setCounter } = useUserContext();
+  
   const token = Cookies.get("authToken");
   const config = {
     headers: {
@@ -256,11 +256,9 @@ const AddTrans: React.FC<{ edit: updateType }> = ({ edit }) => {
   - If an existing expense entry is being edited (`edit.id != -1`):
     - Sends a PATCH request to update the entry.
     - Displays a success notification upon successful update.
-    - Triggers a re-render using the `setCounter` state from `useUserContext`.
   - If a new expense is being added:
     - Sends a POST request to create a new expense entry.
     - Displays a success notification upon successful creation.
-    - Triggers a re-render using `setCounter`.
   - Resets the `expenseData` state to clear the form after submission.
   - Catches and handles errors by displaying an error notification.
 */

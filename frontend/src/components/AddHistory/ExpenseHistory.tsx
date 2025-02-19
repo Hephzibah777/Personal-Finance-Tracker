@@ -7,7 +7,7 @@ import updateType from "../../interfaces/updateType";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import CustomModal from "../Modal";
-import { useUserContext } from "../../hooks/UserProvider";
+
 
 /**Interface defining the expected props for the ExpenseHistory component 
  * containing the id of the row that has to be updated in expense table
@@ -21,7 +21,7 @@ const ExpenseHistory: React.FC<ComponentType> = ({ edit }) => {
   const [expenseData, setExpenseData] = useState<expenseDataType[]>([]);
   const [isModalOpen, setIsModalOpen]=useState(false);
   const [deleteId, setDeleteId]=useState(-1);
-  const {counter, setCounter}=useUserContext();
+  
   
   const token = Cookies.get("authToken");
   const config = {
@@ -32,7 +32,7 @@ const ExpenseHistory: React.FC<ComponentType> = ({ edit }) => {
   useEffect(() => {
    
     fetchData();
-  }, [expenseData]);
+  }, []);
 
   const fetchData = async () => {
     try {
@@ -68,7 +68,8 @@ const ExpenseHistory: React.FC<ComponentType> = ({ edit }) => {
         config
       );
       if (response.status == 200) {
-        setCounter(!counter);
+      
+
         toast.success("Deleted successfully !", {
           position: "top-right",
           autoClose: 2000,

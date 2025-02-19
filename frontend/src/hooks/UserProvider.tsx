@@ -12,7 +12,7 @@ export const UserContext = createContext<userContextType| null>(null);
 export const UserProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
  
  const [user, setUser] = useState<userType|null>(null);
- const [counter, setCounter]=useState(false);
+
  const token = Cookies.get("authToken");
  const config = {
     headers: {
@@ -34,7 +34,7 @@ export const UserProvider: React.FC<{children: React.ReactNode}> = ({ children }
     }
  }, [])
   return (
-    <UserContext.Provider value={{user, counter, setCounter}}>
+    <UserContext.Provider value={{user}}>
       {children}
     </UserContext.Provider>
   );
