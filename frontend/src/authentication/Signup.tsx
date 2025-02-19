@@ -13,9 +13,21 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Signup=()=>{
+  /**
+     * State variables:
+     * - formData: Stores the user's input data.
+     * - checkmsg: Stores the error message when password and confirm password do not match.
+     * - navigate: Used to navigate between pages.
+     */
     const [formData, setFormData]=useState<formDataType|null>(null);
     const [checkmsg, setCheckMsg]=useState("");
     const navigate = useNavigate();
+
+    /**
+     * React Hook Form for form validation.
+     * - mode: "onBlur" ensures validation triggers when input loses focus.
+     * - errors: Stores validation error messages for form fields.
+     */
 
     const {register, handleSubmit, formState:{errors}}=useForm({
         mode:"onBlur"
@@ -26,6 +38,13 @@ const Signup=()=>{
        const value=event.target.value;
        setFormData(values=>({...values, [name]:value} as formDataType));
     }
+
+     /**
+     * Handles form submission.
+     * - Sends user data to the backend API for signup.
+     * - Displays success or error toast messages.
+     * - Redirects to the login page upon successful signup.
+     */
     const onSubmit=async()=>{
       try{
         const user={

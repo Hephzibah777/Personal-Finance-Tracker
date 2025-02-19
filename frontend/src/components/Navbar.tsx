@@ -54,9 +54,9 @@ const navigate = useNavigate();
             <h1 className="text-2xl font-bold">Fundcy</h1>
           </div>
           <div className="mt-10">
-            <div className="w-1/2 h-1/2 bg-blue-200">
-              {user?.username}
-            </div>
+            {/* <div className="w-full  mb-10 rounded-2xl bg-blue-200">
+              Hii {user?.username}
+            </div> */}
             <h1>MENU</h1>
             <div className="mt-2">
               <div className="flex gap-2 hover:bg-blue-300 p-3 pr-30 rounded cursor-pointer" onClick={() => handleState("Dashboard")}>
