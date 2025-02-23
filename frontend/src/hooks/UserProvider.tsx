@@ -1,50 +1,62 @@
-
 /*eslint-disable*/
 
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import userType from '../interfaces/userType';
-import userContextType from '../interfaces/userContextType';
+import React, { createContext, useState, useContext, useEffect } from "react";
+import userType from "../interfaces/userType";
+import userContextType from "../interfaces/userContextType";
 import Cookies from "js-cookie";
-import axios from 'axios';
+import axios from "axios";
+import expenseDataType from "../interfaces/expenseDataType";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-export const UserContext = createContext<userContextType| null>(null);
+export const UserContext = createContext<userContextType | null>(null);
 
-export const UserProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
- 
- const [user, setUser] = useState<userType|null>(null);
+export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [user, setUser] = useState<userType | null>(null);
+  const [expenseCounter, setExpenseCounter] = useState(1);
 
- const token = Cookies.get("authToken");
- const config = {
+  const token = Cookies.get("authToken");
+  const config = {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   };
 
- useEffect(()=>{
-    try{
-        const fetchUserData=async()=>{
-            const response=await axios.get("http://localhost:4000/user",config);
-            console.log(response);
-            setUser(response.data);
-        }
-        fetchUserData();
+  // Function to update user and toggle boolean
+  const updateExpense = () => {
+    const val=expenseCounter+1;
+    setExpenseCounter(val);
+  };
+
+  useEffect(()=>{
+    updateUser();
+  }, [])
+
+
+  const updateUser = async () => {
+    try {
+      const response = await axios.get("http://localhost:4000/user", config);
+      setUser(response.data);
+    } catch (error) {
+      toast.error("Unable to fetch User Details! ", {
+        position: "top-center",
+      });
     }
-    catch(error){
-        alert("Error fetching data");
-    }
- }, [])
+  };
+
   return (
-    <UserContext.Provider value={{user}}>
+    <UserContext.Provider value={{ user, expenseCounter, updateExpense, updateUser }}>
       {children}
     </UserContext.Provider>
   );
 };
 
-
-export const useUserContext =()=>{
-  const context=useContext(UserContext);
-  if(!context){
+export const useUserContext = () => {
+  const context = useContext(UserContext);
+  if (!context) {
     throw new Error("useFormContext");
   }
   return context;
-}
+};

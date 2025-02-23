@@ -17,7 +17,8 @@ import queryRoutes from "./route/queryRoutes"
 import swaggerUi from "swagger-ui-express"
 import swaggerJSDoc from "swagger-jsdoc"
 import errorHandler from "./middleware/errorHandler";
-
+import Budget from "./model/budget";
+import budgetRoutes from "./route/budgetRoutes"
 
 
 // Load environment variables hello
@@ -63,9 +64,13 @@ app.use(cookieParser());
 // Register Swagger UI
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+const allowedorigins=[
+  "http://localhost:5173",
+  "http://10.116.21.80:5173"
+]
 // Middleware
 app.use(cors({
-  origin:"http://localhost:5173",
+  origin:allowedorigins,
   credentials:true
 }));
 app.use(express.json());
@@ -78,12 +83,14 @@ app.use("/", incomeRoutes);
 app.use("/", expenseRoutes);
 app.use("/", categoryRoutes);
 app.use("/", queryRoutes);
+app.use("/", budgetRoutes);
 db.user=User;
 db.income=Income;
 db.expense=Expense;
 db.emi=Emi;
 db.loan=Loan;
 db.category=Category;
+db.budget=Budget;
 
 app.use(errorHandler);
 

@@ -30,7 +30,7 @@ async function addIncome(amount:string, description:string, userId:number, next:
 async function getAllIncome(userId:number, next: NextFunction): Promise<incomeModalType[]> {
     try {
       const income = await db.sequelize.query(
-        `SELECT * FROM Incomes WHERE userId = :userId ORDER BY createdAt DESC LIMIT 5`,
+        `SELECT * FROM Incomes WHERE userId = :userId ORDER BY createdAt DESC`,
         {
           replacements: { userId },
           type: QueryTypes.SELECT,

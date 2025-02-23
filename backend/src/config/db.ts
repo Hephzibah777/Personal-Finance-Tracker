@@ -32,6 +32,7 @@ const db={
     emi:{},
     loan:{},
     category:{},
+    budget:{}
 
 }
 

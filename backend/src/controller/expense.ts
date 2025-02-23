@@ -24,7 +24,7 @@ async function addExpense(req: Request, res: Response, next: NextFunction):Promi
       description:description,
       userId:userId
     }
-    expenseRepo.addExpense(expense, next);
+    await expenseRepo.addExpense(expense, next);
     res.status(200).json({ message: "Successfully added the expense details" });
   } catch (error) {
     next(error);
@@ -63,10 +63,18 @@ async function getSelectedExpense(req: Request, res: Response, next: NextFunctio
 async function getAllExpense(req: Request, res: Response, next: NextFunction):Promise<void> {
   try {
     const { userId } = verifyToken(req);
+    const { page , limit  } = req.query; 
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
     console.log(typeof userId);
-    const expenses=await expenseRepo.getAllExpense(userId, next);
-
-    res.json(expenses);
+    const expenses=await expenseRepo.getAllExpense(userId, pageNumber, limitNumber, next);
+    const length=await expenseRepo.getAllExpensesLength(userId, next);
+    const totalPage=Math.ceil(Number(length)/limitNumber);
+    const data={
+      totalPage:totalPage,
+      expenses:expenses
+    }
+    res.json(data); 
   } catch (error) {
     next(error);
   }
@@ -81,8 +89,8 @@ async function getAllExpense(req: Request, res: Response, next: NextFunction):Pr
 async function deleteSelectedExpense(req: Request, res: Response, next: NextFunction):Promise<void> {
   try {
     const { id } = req.params;
-    expenseRepo.deleteSelectedExpense(id, next);
-    res.json({ message: "Successfully deleted the expense details" });
+    await expenseRepo.deleteSelectedExpense(id, next);
+    res.status(200).json({ message: "Successfully deleted the expense details" });
   } catch (error) {
     next(error);
   }
@@ -105,7 +113,7 @@ async function updateSelectedExpense(req: Request, res: Response, next: NextFunc
      return;
     }
 
-   expenseRepo.updateSelectedExpense(id, body, next)
+   await expenseRepo.updateSelectedExpense(id, body, next)
     res.json({ message: "Successfully updated the expense details" });
   } catch (error) {
     next(error);

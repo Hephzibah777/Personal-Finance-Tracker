@@ -11,7 +11,7 @@ import expenseModalType from "../type/expenseModalType";
 async function addExpense(expense:expenseType, next: NextFunction):Promise<void> {
     try {
       const { amount, category, description, userId } = expense;
-      if (!amount || !category) {
+      if (!amount || !category || !description) {
           return next(new Error('Amount and Category are required'));
       }
   
@@ -50,18 +50,37 @@ async function addExpense(expense:expenseType, next: NextFunction):Promise<void>
   }
 
   //  Get All Expenses (Latest 5)
-async function getAllExpense(userId:number, next: NextFunction):Promise<expenseModalType[]> {
+async function getAllExpense(userId:number, pageNumber:number, limitNumber:number, next: NextFunction):Promise<expenseModalType[]> {
     try {
+
+      const skip = (pageNumber - 1) * limitNumber;
       const expenses = await db.sequelize.query(
-        `SELECT * FROM Expenses WHERE userId = :userId ORDER BY createdAt DESC LIMIT 5`,
+        `SELECT * FROM Expenses WHERE userId = :userId ORDER BY createdAt DESC LIMIT :limitNumber offset :skip`,
         {
-          replacements: { userId },
+          replacements: { userId, limitNumber, skip },
           type: QueryTypes.SELECT,
         }
       );
+
+      
   
      return expenses as expenseModalType[];
     } catch (error) {
+      next(error);
+      return [];
+    }
+  }
+
+  async function  getAllExpensesLength(userId:number, next:NextFunction){
+    try{
+      const expenses=await db.sequelize.query(`SELECT * from Expenses where userId=:userId`,{
+        replacements:{userId},
+        type:QueryTypes.SELECT
+      })
+      const length=expenses.length;
+      return length as number;
+    }
+    catch (error) {
       next(error);
       return [];
     }
@@ -78,7 +97,8 @@ async function deleteSelectedExpense(id:string, next: NextFunction):Promise<void
           type: QueryTypes.DELETE,
         }
       );
-  
+
+      return result;
     } catch (error) {
       next(error);
     }
@@ -109,7 +129,8 @@ async function deleteSelectedExpense(id:string, next: NextFunction):Promise<void
     getSelectedExpense:getSelectedExpense,
     getAllExpense:getAllExpense,
     deleteSelectedExpense:deleteSelectedExpense,
-    updateSelectedExpense:updateSelectedExpense
+    updateSelectedExpense:updateSelectedExpense,
+    getAllExpensesLength:getAllExpensesLength
    
   }
 

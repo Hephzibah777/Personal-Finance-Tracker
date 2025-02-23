@@ -10,6 +10,14 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useUserContext } from "../../hooks/UserProvider";
 import transactionConstants from "../../constants/home";
+import { useForm } from "react-hook-form";
+import ErrorIcon from "@mui/icons-material/Error";
+import {
+  Listbox,
+  ListboxButton,
+  ListboxOption,
+  ListboxOptions,
+} from "@headlessui/react";
 
 /*
   Declaring the `AddTrans` functional component:
@@ -33,15 +41,20 @@ const AddTrans: React.FC<{ edit: updateType }> = ({ edit }) => {
   const [populateIncome, setPopulateIncome] = useState<incomeDataType | null>(
     null
   );
-  const [showToast, setShowToast] = useState(false);
-  
+  const { register: registerIncome, handleSubmit: handleSubmitIncome, formState: { errors: errorsIncome } } = useForm({
+    mode: "onBlur",
+  });
+  const { register: registerExpense, handleSubmit: handleSubmitExpense, formState: { errors: errorsExpense } } = useForm({
+    mode: "onBlur",
+  });
+  const { expenseCounter, updateExpense } = useUserContext();
   const token = Cookies.get("authToken");
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   };
-
+ 
 
   /*
   useEffect Hook:
@@ -59,8 +72,6 @@ const AddTrans: React.FC<{ edit: updateType }> = ({ edit }) => {
   - Displays an alert in case of an error fetching the data.
 */
   useEffect(() => {
-   
-
     const getCategories = async () => {
       try {
         const response = await axios.get(
@@ -72,8 +83,6 @@ const AddTrans: React.FC<{ edit: updateType }> = ({ edit }) => {
         alert("Error fetching categories data");
       }
     };
-
-  
 
     /*
   Function: `checkUpdate`
@@ -113,16 +122,6 @@ const AddTrans: React.FC<{ edit: updateType }> = ({ edit }) => {
     getCategories();
     checkUpdate();
   }, [edit]);
-
-  useEffect(() => {
-    if (showToast) {
-      toast.success("Successfully Added");
-      const timer = setTimeout(() => {
-        setShowToast(false);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [showToast]);
 
   /*
   Function: `addCategory`
@@ -172,11 +171,11 @@ const AddTrans: React.FC<{ edit: updateType }> = ({ edit }) => {
     }
   };
 
-  const handleSelectExpense = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const name = event.target.name;
-    const value = event.target.value;
+  const handleSelectExpense = (value: string | undefined) => {
+    console.log(value);
+    setSelectedCategory(value as string);
     setExpenseData(
-      (values) => ({ ...values, [name]: value } as expenseDataType)
+      (values) => ({ ...values, ["category"]: value } as expenseDataType)
     );
   };
 
@@ -204,11 +203,8 @@ const AddTrans: React.FC<{ edit: updateType }> = ({ edit }) => {
   - Resets the `incomeData` state to clear the form after submission.
   - Catches and handles errors by displaying an error notification.
 */
-
-
-  const handleAddIncome = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleAddIncome = async () => {
     try {
-      event.preventDefault();
       if (edit.id == -1) {
         const response = await axios.post(
           "http://localhost:4000/incomes",
@@ -256,51 +252,74 @@ const AddTrans: React.FC<{ edit: updateType }> = ({ edit }) => {
   - If an existing expense entry is being edited (`edit.id != -1`):
     - Sends a PATCH request to update the entry.
     - Displays a success notification upon successful update.
+    - Triggers a re-render using the `setCounter` state from `useUserContext`.
   - If a new expense is being added:
     - Sends a POST request to create a new expense entry.
     - Displays a success notification upon successful creation.
+    - Triggers a re-render using `setCounter`.
   - Resets the `expenseData` state to clear the form after submission.
   - Catches and handles errors by displaying an error notification.
 */
-  const handleAddExpense = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    try {
-      if (edit.id != -1) {
-        const data = {
-          amount: expenseData?.amount,
-          category: expenseData?.category,
-          description: expenseData?.description,
-        };
-        const response = await axios.patch(
-          `http://localhost:4000/expenses/${edit.id}`,
-          data,
-          config
-        );
-        if (response.status == 200) {
-          toast.success("Expense updated successfully!", {
-            position: "top-center",
-          });
-       
-        }
-        edit.id = -1;
-        edit.type = "";
-      } else {
-        const response = await axios.post(
-          "http://localhost:4000/expenses",
-          expenseData,
-          config
-        );
-        if (response.status == 200) {
-          
-         toast.success("New expense added successfully!", {
-            position: "top-center",
-            autoClose: 3000,
-          });
-          
-          
-        }
+
+  const validateInputs = (
+    obj: expenseDataType | null | incomeDataType
+  ): boolean => {
+    let flag = true;
+    if (!obj) return false;
+    console.log(obj);
+    Object.keys(obj).forEach((key, value) => {
+      if (value == null) {
+        console.log(key);
+        flag = false;
       }
-      setExpenseData({ id: "", amount: "", category: "", description: "" });
+    });
+    return flag;
+  };
+  const handleAddExpense = async () => {
+ 
+    try {
+      if (validateInputs(expenseData) == true) {
+        if (edit.id != -1) {
+          const data = {
+            amount: expenseData?.amount,
+            category: expenseData?.category,
+            description: expenseData?.description,
+          };
+          console.log(data);
+          const response = await axios.patch(
+            `http://localhost:4000/expenses/${edit.id}`,
+            data,
+            config
+          );
+          if (response.status == 200) {
+            toast.success("Expense updated successfully!", {
+              position: "top-center",
+            });
+          }
+          edit.id = -1;
+          edit.type = "";
+        } else {
+          const response = await axios.post(
+            "http://localhost:4000/expenses",
+            expenseData,
+            config
+          );
+          updateExpense();
+          if (response.status == 200) {
+            toast.success("New expense added successfully!", {
+              position: "top-center",
+              autoClose: 3000,
+            });
+          }
+        }
+
+        setExpenseData({ id: "", amount: "", category: "", description: "" });
+        setSelectedCategory("");
+      } else {
+        toast.error("Inputs Missing!", {
+          position: "top-center",
+        });
+      }
     } catch (error) {
       toast.error(
         "Something went wrong. Please check your internet connection and try again!",
@@ -313,100 +332,197 @@ const AddTrans: React.FC<{ edit: updateType }> = ({ edit }) => {
 
   return (
     <>
-      <div className="w-1/3">
-        <div>
-          <form onSubmit={handleAddIncome}>
-            <div className="h-2/5 bg-blue-100 shadow-lg rounded-3xl p-5 mb-5 ">
-              <h1 className="text-2xl font-bold">{transactionConstants.income}</h1>
-              <div className="mt-2 flex-col">
-                <div>
-                  <h2 className="mb-2">{transactionConstants.incomeamount}</h2>
-                  <input
-                    name="amount"
-                    value={incomeData?.amount}
-                    onChange={handleChangeIncome}
-                    className="mb-2 border-gray-200 rounded-2xl w-full p-2 bg-white"
-                  />
+      <>
+        <div className="w-full flex flex-col items-center  lg:w-1/3 md:w-2/3  mx-auto  ">
+          {/* Income Form */}
+          <div className="w-full ">
+            <form onSubmit={handleSubmitIncome(handleAddIncome)}>
+              <div className="bg-blue-100 shadow-lg rounded-3xl p-5 mb-6 ">
+                <h1 className="text-2xl font-bold">
+                  {transactionConstants.income}
+                </h1>
+                <div className="mt-2 flex flex-col gap-2">
+                  <div>
+                    <h2 className="mb-2">
+                      {transactionConstants.incomeamount}
+                    </h2>
+                    {errorsIncome.amount?.message && (
+                      <div className="mb-1 flex justify-end absolute xl:top-35 xl:left-152 top-30 left-60 text-red-500 text-sm">
+                        <ErrorIcon />
+                        <p className="pl-2 pr-2">
+                          {errorsIncome.amount.message as string}
+                        </p>
+                      </div>
+                    )}
+                    <input
+                      {...registerIncome("amount", {
+                        required: {
+                          value: true,
+                          message: "Amount is required",
+                        },
+                      })}
+                      name="amount"
+                      value={incomeData?.amount}
+                      onChange={handleChangeIncome}
+                      className="mb-2 border-gray-200 rounded-2xl w-full p-2 bg-white"
+                    />
+                  </div>
+                  <div>
+                    <h2 className="mb-2">
+                      {transactionConstants.incomedescription}
+                    </h2>
+                    {errorsIncome.description?.message && (
+                      <div className="mb-1 flex justify-end absolute xl:top-60 xl:left-148 top-55 left-55 text-red-500 text-sm">
+                        <ErrorIcon />
+                        <p className="pl-2 pr-2">
+                          {errorsIncome.description.message as string}
+                        </p>
+                      </div>
+                    )}
+                    <input
+                      {...registerIncome("description", {
+                        required: {
+                          value: true,
+                          message: "Description is required",
+                        },
+                      })}
+                      name="description"
+                      value={incomeData?.description}
+                      onChange={handleChangeIncome}
+                      className="mb-2 border-gray-200 rounded-2xl w-full p-2 bg-white"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <h2 className="mb-2">{transactionConstants.incomedescription}</h2>
-                  <input
-                    name="description"
-                    value={incomeData?.description}
-                    onChange={handleChangeIncome}
-                    className="mb-2 border-gray-200 rounded-2xl w-full p-2 bg-white"
-                  />
-                </div>
-              </div>
-              <div className="mt-5">
-                <button className="w-full p-3 bg-blue-950 rounded-2xl text-white">
-                  {transactionConstants.incomebutton}
-                </button>
-              </div>
-            </div>
-          </form>
-        </div>
-
-        <div>
-          <form onSubmit={handleAddExpense}>
-            <div className="h-2/5 bg-blue-100 shadow-lg rounded-3xl p-5">
-              <h1 className="text-2xl font-bold">{transactionConstants.expense}</h1>
-              <div className="mt-2 flex-col">
-                <div>
-                  <h2 className="mb-2">{transactionConstants.expenseamount}</h2>
-                  <input
-                    name="amount"
-                    value={expenseData?.amount}
-                    onChange={handleChangeExpense}
-                    className="mb-2 border-gray-200 rounded-2xl w-full p-2 bg-white"
-                  />
-                </div>
-                <div className="mb-1 mt-3 border border-gray-400 p-3 rounded-xl ">
-                  <select
-                    className="focus:border-none"
-                    value={expenseData?.category}
-                    name="category"
-                    onChange={handleSelectExpense}
-                  >
-                    <option>{transactionConstants.expensecategory}</option>
-                    {categories.map((key) => (
-                      <option key={key.name}>{key.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="flex justify-end gap-5 mt-3 mb-3">
-                  <input
-                    className="border-gray-200 bg-white w-1/2 rounded p-1"
-                    value={categoryData}
-                    onChange={handleChangeCategory}
-                    placeholder="Add Category"
-                  />
-                  <button
-                    className="bg-blue-950 rounded-xl p-3 text-white"
-                    onClick={addCategory}
-                  >
-                    Add
+                <div className="mt-5">
+                  <button className="w-full p-3 bg-blue-950 rounded-2xl text-white">
+                    {transactionConstants.incomebutton}
                   </button>
                 </div>
-                <div>
-                  <h2 className="mb-2">{transactionConstants.expensedescription}</h2>
-                  <input
-                    value={expenseData?.description}
-                    name="description"
-                    onChange={handleChangeExpense}
-                    className="mb-2 border-gray-200 rounded-2xl w-full p-2 bg-white"
-                  />
+              </div>
+            </form>
+          </div>
+
+          {/* Expense Form */}
+          <div className="w-full max-w-md">
+            <form onSubmit={handleSubmitExpense(handleAddExpense)}>
+              <div className="bg-blue-100 shadow-lg rounded-3xl p-5">
+                <h1 className="text-2xl font-bold">
+                  {transactionConstants.expense}
+                </h1>
+                <div className="mt-2 ">
+                  <div>
+                    <h2 className="mb-2">
+                      {transactionConstants.expenseamount}
+                    </h2>
+                    {errorsExpense.amount?.message && (
+                      <div className="mb-1 flex justify-end absolute xl:top-122 xl:left-154 top-55 left-55 text-red-500 text-sm">
+                        <ErrorIcon />
+                        <p className="pl-2 pr-2">
+                          {errorsExpense.amount.message as string}
+                        </p>
+                      </div>
+                    )}
+                    <input
+                      {...registerExpense("amount", {
+                        required: {
+                          value: true,
+                          message: "Amount is required",
+                        },
+                      })}
+                      name="amount"
+                      value={expenseData?.amount}
+                      onChange={handleChangeExpense}
+                      className="mb-2 border-gray-200 rounded-2xl w-full p-2 bg-white"
+                    />
+                  </div>
+                  <div className="mb-3 mt-5">
+                  {/* {errorsExpense.category?.message && (
+                      <div className="mb-1 flex justify-end absolute xl:top-140  xl:left-152 top-65 left-55 text-red-500 text-sm">
+                        <ErrorIcon />
+                        <p className="pl-2 pr-2">
+                          {errorsExpense.category.message as string}
+                        </p>
+                      </div>
+                    )} */}
+                    <Listbox
+                    //   {...registerExpense("category", {
+                    //     required: {
+                    //       value: true,
+                    //       message: "Category is required",
+                    //     },
+                    //   })}
+                    //   value={expenseData?.category}
+                    //   onChange={handleSelectExpense}
+                    //   name="category"
+                    >
+                      <div className="relative">
+                        <ListboxButton className="border-none text-black-500 p-2 rounded-2xl p-1 bg-white w-full flex justify-start">
+                          {selectedcategory || "Select Category"}
+                        </ListboxButton>
+                        <ListboxOptions className="absolute w-full max-h-40 overflow-y-auto border bg-white shadow-lg rounded">
+                          {categories.map((key) => (
+                            <ListboxOption
+                              key={key.name}
+                              value={key.name}
+                              className="cursor-pointer p-2 hover:bg-blue-100"
+                            >
+                              {key.name}
+                            </ListboxOption>
+                          ))}
+                        </ListboxOptions>
+                      </div>
+                    </Listbox>
+                  </div>
+                  <div className="flex flex-col md:flex-row justify-between items-center gap-3 mt-3 mb-3">
+                    <input
+                      className="border-gray-200 bg-white w-full md:w-3/5 rounded-2xl p-2"
+                      value={categoryData}
+                      onChange={handleChangeCategory}
+                      placeholder="Add Category"
+                    />
+                    <button
+                      className="bg-blue-950 rounded-xl p-3 text-white w-full md:w-2/5"
+                      onClick={addCategory}
+                    >
+                      Add
+                    </button>
+                  </div>
+                  <div>
+                    <h2 className="mb-2">
+                      {transactionConstants.expensedescription}
+                    </h2>
+                    {errorsExpense.description?.message && (
+                      <div className="mb-1 flex justify-end absolute xl:top-178  xl:left-148 top-65 left-55 text-red-500 text-sm">
+                        <ErrorIcon />
+                        <p className="pl-2 pr-2">
+                          {errorsExpense.description.message as string}
+                        </p>
+                      </div>
+                    )}
+                    <input
+                    {...registerExpense("description", {
+                      required: {
+                        value: true,
+                        message: "Description is required",
+                      },
+                    })}
+                      value={expenseData?.description}
+                      name="description"
+                      onChange={handleChangeExpense}
+                      className="mb-2 border-gray-200 rounded-2xl w-full p-2 bg-white"
+                    />
+                  </div>
+                </div>
+                <div className="mt-5">
+                  <button className="w-full p-3 bg-blue-950 rounded-2xl text-white">
+                    {transactionConstants.expensebutton}
+                  </button>
                 </div>
               </div>
-              <div className="mt-5 ">
-                <button className="w-full p-3 bg-blue-950 rounded-2xl text-white">
-                  {transactionConstants.expensebutton}
-                </button>
-              </div>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
-      </div>
+      </>
     </>
   );
 };

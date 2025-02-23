@@ -6,6 +6,7 @@ import Transaction from "./Transaction";
 import Analysis from "./Analysis";
 import Cookies from "js-cookie";
 import { useNavigate } from 'react-router-dom';
+import Budget from "./Budget";
 function Home(){
     const [status, setStatus]=useState("Transactions");
     const navigate = useNavigate();
@@ -13,7 +14,11 @@ function Home(){
         <>
         <div className="flex">
             <Navbar option={setStatus}/>
-            {status=="Dashboard"? <Analysis/> : <Transaction/>}
+         
+             {status === "Dashboard" && <Analysis />} 
+        {status === "Budget" && <Budget />}
+        {status === "Transactions" && <Transaction />}
+        
         </div>
         </>
     )

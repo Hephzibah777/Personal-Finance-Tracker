@@ -12,13 +12,13 @@ const CustomModal:React.FC<modalPropsType> = ({ open, onClose, onConfirm, title,
         <div className="mt-4 flex justify-end gap-2">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-red-950 text-white rounded-md"
+            className="px-4 py-2 bg-red-950 text-white rounded-md cursor-pointer"
           >
             No
           </button>
           <button
             onClick={onConfirm}
-            className="px-4 py-2 bg-blue-950 text-white  rounded-md"
+            className="px-4 py-2 bg-blue-950 text-white  rounded-md cursor-pointer"
           >
             Yes
           </button>

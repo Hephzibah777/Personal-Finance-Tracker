@@ -10,6 +10,8 @@ import Cookies from "js-cookie"
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import {useForm} from "react-hook-form";
+import ErrorIcon from '@mui/icons-material/Error';
 
 
 /**
@@ -24,6 +26,10 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 const Login=()=>{
      const [loginData, setLoginData]=useState<loginType|null>(null);
      const [showPassword, setShowPassword]=useState(false);
+      const {register, handleSubmit, formState:{errors}}=useForm({
+            mode:"onBlur"
+        });
+    
 
      const navigate = useNavigate();
      const handleChange=(event:React.ChangeEvent<HTMLInputElement>)=>{
@@ -32,8 +38,8 @@ const Login=()=>{
         setLoginData(values=>({...values, [name]:value} as loginType));
      }
 
-     const onSubmit=async(event:React.FormEvent<HTMLFormElement>)=>{
-        event.preventDefault();
+     const onSubmit=async()=>{
+       
         try{
             const response = await axios.post('http://localhost:4000/login', loginData);
            if(response.status==200){
@@ -43,10 +49,10 @@ const Login=()=>{
                       });
             Cookies.set('authToken', response.data.token, { 
                 expires: 7, 
-                secure: true,
                 sameSite: 'strict'
               });
               setTimeout(()=>navigate("/home"), 2000);
+              
            }
            else if(response.status==400){
             toast.error("Wrong Password!", {
@@ -71,23 +77,48 @@ const Login=()=>{
         <div className='flex justify-end'>
             <p>Don't have an account? <span className='text-blue-500 cursor-pointer' onClick={() => navigate("/")}>Sign Up</span></p>
            </div>
-           <form onSubmit={onSubmit}>
+           <form onSubmit={handleSubmit(onSubmit)}>
            <div className='ml-15 mt-15'>
             <h1 className='text-5xl'>Log In</h1>
             <p className='mt-5 text-gray-400'>Plan Today for a Richer Tomorrow</p>
             <div className='mt-10 w-4/5'>
                 <div className='mb-13'>
                     <div>
+                    {errors.email?.message && <div className='mb-1 flex justify-end text-red-500 text-sm'>
+                       <ErrorIcon/>
+                        <p className='pl-2 pr-2'>{errors.email.message as string}</p>
+                </div>}
                         <AlternateEmailIcon className='mr-5'/>
-                    <input placeholder='Email' className='outline-none' value={loginData?.email} onChange={handleChange} name="email"/>
+                    <input 
+                     {...register("email", {
+                        required:{
+                          value:true,
+                          message:'Email is required'
+                        },
+                        
+                        })}
+                    placeholder='Email' className='outline-none' value={loginData?.email} onChange={handleChange} name="email"/>
                     </div>
                     <hr className='mt-2'></hr>
                 </div>
                 <div className='mb-13'>
+                {errors.password?.message && <div className='mb-1 flex justify-end text-red-500 text-sm'>
+                       <ErrorIcon/>
+                        <p className='pl-2 pr-2'>{errors.password.message as string}</p>
+                </div>}
                     <div className='flex justify-between'>
+                   
                     <div>
                         <LockOpenIcon className='mr-5'/>
-                    <input placeholder='Password' type={showPassword==true?"text":"password"} 
+                    <input
+                     {...register("password", {
+                        required:{
+                          value:true,
+                          message:'Password is required'
+                        },
+                        
+                        })}
+                     placeholder='Password' type={showPassword==true?"text":"password"} 
                     className='outline-none' value={loginData?.password} onChange={handleChange} name="password"/>
                     </div>
                     <div className='cursor-pointer' onClick={() => setShowPassword(!showPassword)}>

@@ -69,7 +69,7 @@ const  History:React.FC<ComponentType>=({edit})=>{
 
     return(
         <>
-       <div className="w-2/3 h-full bg-blue-100 shadow-lg  rounded-3xl p-10">
+       {/* <div className="w-2/3 h-full bg-blue-100 shadow-lg  rounded-3xl p-10">
         <div className="w-full h-full">
             <div className="flex text-center gap-10">
             <div className="bg-blue-950 text-white w-1/3 h-1/2 p-3 rounded-2xl">
@@ -93,7 +93,47 @@ const  History:React.FC<ComponentType>=({edit})=>{
        {data=="Income History" ? <IncomeHistory edit={edit}/>:<ExpenseHistory edit={edit}/>}
         </div>
          <ToastContainer />
-       </div>
+       </div> */}
+
+<div className="w-full md:w-4/5 lg:w-full lg:max-w-4xl sm:h-full  bg-blue-100 shadow-lg rounded-3xl p-6 lg:mr-20 md:p-10 mx-auto overflow-x-auto">
+  <div className="w-full h-full">
+    {/* Income, Expense, Balance Section */}
+    <div className="flex flex-col sm:flex-row text-center gap-4 md:gap-2">
+      <div className="bg-blue-950 text-white w-full sm:w-1/3  h-1/3 p-3 rounded-2xl flex items-center justify-center">
+        <h1>Total Income: {totalincome}Rs</h1>
+      </div>
+      <div className="bg-blue-950 text-white w-full sm:w-1/3 h-1/3 p-3 rounded-2xl flex items-center justify-center">
+        <h1>Total Expense: {totalexpense}Rs</h1>
+      </div>
+      <div className="bg-blue-950 text-white w-full sm:w-1/3 h-1/3 p-3 rounded-2xl flex items-center justify-center">
+        <h1>Total Balance: {totalbalance}Rs</h1>
+      </div>
+    </div>
+
+    {/* History Selector */}
+    <div className="mt-6">
+      <div className="flex gap-3 ">
+        <select
+          className="border p-3 border-blue-950 rounded w-full sm:w-auto"
+          value={data}
+          onChange={handleChange}
+        >
+          <option>Expense History</option>
+          <option>Income History</option>
+        </select>
+      </div>
+    </div>
+
+    {/* History Display */}
+    <div className="mt-6">
+      {data === "Income History" ? <IncomeHistory edit={edit} /> : <ExpenseHistory edit={edit} />}
+    </div>
+  </div>
+  
+  {/* Toast Notification */}
+  <ToastContainer />
+</div>
+
         </>
     )
 }

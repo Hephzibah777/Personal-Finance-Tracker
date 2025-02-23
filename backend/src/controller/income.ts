@@ -23,7 +23,7 @@ async function addIncome(req: Request, res: Response, next: NextFunction): Promi
   try {
     const { amount, description } = req.body;
     const { userId } = verifyToken(req);
-    incomeRepo.addIncome(amount, description, userId, next);
+    await incomeRepo.addIncome(amount, description, userId, next);
    
     res.status(201).json({ message: "Income added successfully" });
   } catch (error) {
@@ -86,7 +86,7 @@ async function deleteSelectedIncome(req: Request, res: Response, next: NextFunct
     const { id } = req.params;
     const { userId } = verifyToken(req);
 
-    incomeRepo.deleteSelectedIncome(id, userId,next);
+    await incomeRepo.deleteSelectedIncome(id, userId,next);
 
     res.status(200).json({ message: "Income deleted successfully" });
   } catch (error) {
@@ -108,7 +108,7 @@ async function updateSelectedIncome(req: Request, res: Response, next: NextFunct
     const body = req.body;
     
 
-  incomeRepo.updateSelectedIncome(id,userId,body,next);
+  await incomeRepo.updateSelectedIncome(id,userId,body,next);
 
     res.status(201).json({ message: "Income updated successfully" });
   } catch (error) {

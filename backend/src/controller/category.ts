@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import db from "../config/db";
 import { QueryTypes } from "sequelize";
+import CustomError from "../middleware/CustomError";
 
 
 /**
@@ -20,6 +21,9 @@ async function addCategory(req: Request, res: Response, next:NextFunction): Prom
         replacements: { name: name },
         type: QueryTypes.INSERT,
       });
+      if(!category){
+        next(new CustomError("Error fetching Data", 500))
+      }
       res.status(200).json({message:"Successfully added"})
   } catch (error) {
     next(error);
